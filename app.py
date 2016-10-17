@@ -8,13 +8,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
-def verify():
-    # when the endpoint is registered as a webhook, it must echo back
-    # the 'hub.challenge' value it receives in the query arguments
-    if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
-        if not request.args.get("hub.verify_token") == os.environ["VERIFY_TOKEN"]:
-            return "Verification token mismatch", 403
-        return request.args["hub.challenge"], 200
+def home():
 
     return "Hello world", 200
 
@@ -27,7 +21,7 @@ def verify():
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
 
-    return "Hello world", 200
+    return "Facebook Webhook URL", 200
 
 
 @app.route('/facebook/webhook/', methods=['POST'])
@@ -52,7 +46,7 @@ def webhook():
                     if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
                         send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
 
-                    else if 'ted' in message_text.lower():
+                    elif'ted' in message_text.lower():
                         send_message(sender_id, "Ted is a god.")
 
                     else:
