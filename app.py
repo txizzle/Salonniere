@@ -20,7 +20,7 @@ def verify():
     return "Hello world", 200
 
 
-@app.route('/', methods=['POST'])
+@app.route('/facebook/webhook', methods=['POST'])
 def webhook():
 
     # endpoint for processing incoming messaging events
@@ -39,7 +39,14 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
 
-                    send_message(sender_id, "got it, thanks!")
+                    if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
+                        send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
+
+                    else if 'ted' in message_text.lower():
+                        send_message(sender_id, "Ted is a god.")
+
+                    else:
+                        send_message(sender_id, "idk how to respond to that... o.o")
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
