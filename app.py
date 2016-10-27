@@ -3,14 +3,13 @@ import sys
 import json
 
 import requests
-from flask import Flask, request
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
-def home():
-
-    return "Hello world", 200
+def index():
+    return render_template('index.html')
 
 @app.route('/facebook/webhook/', methods=['GET'])
 def verify():
