@@ -1,4 +1,9 @@
-# Facebook Messenger Bot
-This is a simple python template that uses Flask to build a webhook for Facebook's Messenger Bot API.
+# Salonniere Intelligent Event Organizer
+Salonniere is an intelligent event organizer built for UC Berkeley's Chatbot Collider in Fall 2016. 
 
-Read more in my [tutorial that uses this repository](https://blog.hartleybrody.com/fb-messenger-bot/)
+Salonniere: https://www.facebook.com/SalonniereAI/
+
+# This repository
+This repository contains Flask endpoints for Facebook's Messenger Bot API.
+
+Based on this [tutorial](https://blog.hartleybrody.com/fb-messenger-bot/)
