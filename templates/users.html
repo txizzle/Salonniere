@@ -1,0 +1,8 @@
+<h3>Users</h3>
+    <table>
+    {%- for user in users %}
+        <tr>
+            <td>{{ user.email }}</td>
+        </tr>
+    {%- endfor %}
+</table>
