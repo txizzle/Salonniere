@@ -4,7 +4,7 @@ import json
 
 import requests
 from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 
 from flask.ext.heroku import Heroku
 
@@ -25,7 +25,6 @@ class User(db.Model):
 
     def __repr__(self):
         return '<E-mail %r>' % self.email
-
 
 
 @app.route('/', methods=['GET'])
