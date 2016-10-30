@@ -4,14 +4,18 @@ import json
 
 import requests
 from flask import Flask, render_template, request
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
-from flask.ext.heroku import Heroku
+from flask_heroku import Heroku
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/all-users'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
+#app.config['SQLALCHEMY_BINDS'] = {
+#    'users': 'postgresql://localhost/all-users',
+#    'events': 'postgresql://localhost/all-events'
+#}
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-heroku = Heroku(app)
+# heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 # Create our database model
@@ -19,6 +23,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True)
+    events = db.relationship('Event')
 
     def __init__(self, email):
         self.email = email
@@ -26,6 +31,20 @@ class User(db.Model):
     def __repr__(self):
         return '<E-mail %r>' % self.email
 
+class Event(db.Model):
+    __tablename__ = "events"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(240))
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    owner = db.relationship('users', foreign_keys='events.owner_id')
+
+    def __init__(self, owner_email, name):
+        self.owner_id = User.query.filter(User.email.match(owner_email))[0].id
+        self.name = name
+
+    def __repr__(self):
+        return '<Name %r> <Owner %r>' % (self.name, self.owner.email)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -37,9 +56,20 @@ def users_index():
        'users.html',
        users=User.query.all())
 
+@app.route('/events', methods=['GET'])
+def events_index():
+    return render_template(
+        'events.html',
+        events=Event.query.all())
+
 @app.route('/signup', methods=['GET'])
 def signup_index():
     return render_template('signup_index.html')
+
+# Created for testing purposes only
+@app.route('/create_event', methods=['GET'])
+def create_event_index():
+    return render_template('event_signup_index.html')
 
 # Save e-mail to database and send to success page
 @app.route('/prereg', methods=['POST'])
@@ -50,6 +80,21 @@ def prereg():
         # Check that email does not already exist (not a great query, but works)
         if not db.session.query(User).filter(User.email == email).count():
             reg = User(email)
+            db.session.add(reg)
+            db.session.commit()
+            return render_template('success.html')
+    return render_template('index.html')
+
+@app.route('/events_prereg', methods=['POST'])
+def events_prereg():
+    owner_email = None
+    name = None
+    if request.method == 'POST':
+        owner_email = request.form['owner_email']
+        name = request.form['name']
+        # Check that the owner is a real user
+        if db.session.query(User).filter(User.email == owner_email).count():
+            reg = Event(owner_email, name)
             db.session.add(reg)
             db.session.commit()
             return render_template('success.html')

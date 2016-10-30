@@ -1,0 +1,9 @@
+<h3>Events</h3>
+    <table>
+    {%- for event in events %}
+        <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.owner.email }}</td>
+        </tr>
+    {%- endfor %}
+</table>
