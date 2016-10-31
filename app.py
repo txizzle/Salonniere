@@ -1,6 +1,6 @@
 import os
 import sys
-import json
+import json #import simplejson as json
 
 import requests
 from flask import Flask, render_template, request
@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
 # heroku = Heroku(app)
 db = SQLAlchemy(app)
 
-# Create our database model
+# Create our User model
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -31,18 +31,37 @@ class User(db.Model):
     def __repr__(self):
         return '<E-mail %r>' % self.email
 
+# Create our Event model
 class Event(db.Model):
+    # An Event consists of an event name, owner, event type, event location, 
+    #   starting time, end time, expected guests, attire, and other attributes.
     __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(240))
+    event_type = db.Column(db.String(240))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    location = db.Column(db.String(240))
+    start_time = db.Column(db.DateTime(timezone=False)) # May need to set timezone=True in the future
+    end_time = db.Column(db.DateTime(timezone=False))
+    num_guests = db.Column(db.Integer)
+    attire = db.Column(db.String(240))
+    other = db.Column(db.String(2400)) # Store dictionary as JSON String. Better way: Store a pickled dictionary as a db.Blob
 
-    def __init__(self, owner_email, name):
+    def __init__(self, owner_email, name, event_type=None, location=None, start_time=None, end_time=None, 
+        num_guests=None, attire=None, other=None):
         self.owner_id = User.query.filter(User.email.match(owner_email))[0].id
         self.name = name
+        self.event_type = event_type
+        self.location = location
+        self.start_time = start_time
+        self.end_time = end_time
+        self.num_guests = num_guests
+        self.attire = attire
+        self.other = other
 
     def __repr__(self):
-        return '<Name %r> <Owner %r>' % (self.name, self.owner.email)
+        return ('<Name %r> <Owner %r> <Event Type %r> <Location %r> <Start Time %r> <End Time %r> <Guests %r> <Attire %r> <Other %r>'
+            % (self.name, self.owner.email, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
 
 @app.route('/', methods=['GET'])
 def index():
