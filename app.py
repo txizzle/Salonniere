@@ -21,13 +21,13 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 # Setup PostgreSQL Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
 #app.config['SQLALCHEMY_BINDS'] = {
 #    'users': 'postgresql://localhost/all-users',
 #    'events': 'postgresql://localhost/all-events'
 #}
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# heroku = Heroku(app)
+heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 # User model
@@ -145,6 +145,7 @@ def send_mail():
        recipients=
        ['t.xiao@berkeley.edu'])
     msg.body = "Test message from Salonniere!"
+    msg.html = render_template('invitation_email.html')
     mail.send(msg)
     return "Sent"
 
