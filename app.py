@@ -7,8 +7,20 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_heroku import Heroku
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+
+# Setup Flask-Mail
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'salonniere.ai@gmail.com'
+app.config['MAIL_PASSWORD'] = 'chatbotcollider'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
+# Setup PostgreSQL Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
 #app.config['SQLALCHEMY_BINDS'] = {
 #    'users': 'postgresql://localhost/all-users',
@@ -18,7 +30,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
 # heroku = Heroku(app)
 db = SQLAlchemy(app)
 
-# Create our User model
+# User model
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -31,7 +43,7 @@ class User(db.Model):
     def __repr__(self):
         return '<E-mail %r>' % self.email
 
-# Create our Event model
+# Event model
 class Event(db.Model):
     # An Event consists of an event name, owner, event type, event location, 
     #   starting time, end time, expected guests, attire, and other attributes.
@@ -63,27 +75,31 @@ class Event(db.Model):
         return ('<Name %r> <Owner %r> <Event Type %r> <Location %r> <Start Time %r> <End Time %r> <Guests %r> <Attire %r> <Other %r>'
             % (self.name, self.owner.email, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
 
+# Index route for main landing page
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
+# View to list Users table
 @app.route('/users', methods=['GET'])
 def users_index():
     return render_template(
        'users.html',
        users=User.query.all())
 
+# View to list Events table
 @app.route('/events', methods=['GET'])
 def events_index():
     return render_template(
         'events.html',
         events=Event.query.all())
 
+# View to signup a new User
 @app.route('/signup', methods=['GET'])
 def signup_index():
     return render_template('signup_index.html')
 
-# Created for testing purposes only
+# View to create a new Event with an existing User
 @app.route('/create_event', methods=['GET'])
 def create_event_index():
     return render_template('event_signup_index.html')
@@ -110,12 +126,27 @@ def events_prereg():
         owner_email = request.form['owner_email']
         name = request.form['name']
         # Check that the owner is a real user
+        # TODO: If not, should we register them as a new user?
         if db.session.query(User).filter(User.email == owner_email).count():
             reg = Event(owner_email, name)
             db.session.add(reg)
             db.session.commit()
             return render_template('success.html')
+        else:
+            return render_template('fail.html')
     return render_template('index.html')
+
+# Test route to send an email
+@app.route('/mail_test')
+def send_mail():
+    msg = Message(
+      'Hello',
+       sender='salonniere.ai@gmail.com',
+       recipients=
+       ['t.xiao@berkeley.edu'])
+    msg.body = "Test message from Salonniere!"
+    mail.send(msg)
+    return "Sent"
 
 @app.route('/facebook/webhook/', methods=['GET'])
 def verify():
