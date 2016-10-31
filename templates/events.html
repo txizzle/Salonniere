@@ -2,6 +2,7 @@
     <table>
     	<tr>
             <th>Event Name</th>
+            <th>Event ID</th>
             <th>Owner</th>
             <th>Event Type</th>
             <th>Location</th>
@@ -14,6 +15,7 @@
     {%- for event in events %}
         <tr>
             <td>{{ event.name }}</td>
+            <td>{{ event.id }}</td>
             <td>{{ event.owner.email }}</td>
             <td>{{ event.event_type }}</td>
             <td>{{ event.location }}</td>

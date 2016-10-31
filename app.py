@@ -136,18 +136,36 @@ def events_prereg():
             return render_template('fail.html')
     return render_template('index.html')
 
+@app.route('/email')
+def email_index():
+    return render_template('email.html')
+
 # Test route to send an email
-@app.route('/mail_test')
-def send_mail():
-    msg = Message(
-      'Hello',
-       sender='salonniere.ai@gmail.com',
-       recipients=
-       ['t.xiao@berkeley.edu'])
-    msg.body = "Test message from Salonniere!"
-    msg.html = render_template('invitation_email.html')
+@app.route('/send_invite', methods=['POST'])
+def send_invite():
+    owner_email, event_id, guest_email = None, None, None
+    if request.method == 'POST':
+        owner_email = request.form['owner_email']
+        event_id = request.form['event_id']
+        guest_email= request.form['guest_email']
+        if db.session.query(User).filter(User.email == owner_email).count() and db.session.query(Event).filter(Event.id == event_id).count():
+            event = db.session.query(Event).get(event_id)
+            send_email('You\'re Invited!', 
+                        'salonniere.ai@gmail.com', 
+                        guest_email, 
+                        # render_template("follower_email.txt", user=followed, follower=follower),
+                        'Test message body from Salonniere',
+                        render_template("invitation_email.html", owner_email=owner_email, guest_email=guest_email, event=event))
+            return render_template('success.html')
+        else:
+            return render_template('fail.html')
+    return render_template('index.html')
+
+def send_email(subject, sender, recipient, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=[recipient])
+    msg.body = text_body
+    msg.html = html_body
     mail.send(msg)
-    return "Sent"
 
 @app.route('/facebook/webhook/', methods=['GET'])
 def verify():

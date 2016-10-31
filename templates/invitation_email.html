@@ -54,12 +54,12 @@ div[style*="margin: 16px 0;"] { margin: 0 !important; }
 
 <!-- HIDDEN PREHEADER TEXT -->
 <div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: Open Sans, Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">
-    Lorem ipsum dolor que ist
+    You're Invited!
 </div>
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-        <td align="center" valign="top" width="100%" background="http://salonniere.herokuapp.com/static/img/bg.jpg" bgcolor="#3b4a69" style="background: #3b4a69 url(http://salonniere.herokuapp.com/static/img/bg.jpg); background-size: cover; padding: 50px 15px;" class="mobile-padding">
+        <td align="center" valign="top" width="100%" background="http://salonniere.herokuapp.com/static/img/bg.jpg" bgcolor="#3b4a69" style="background: #3b4a69 url(http://salonniere.herokuapp.com/static/img/party2.jpeg); background-size: cover; padding: 50px 15px;" class="mobile-padding">
             <table align="center" border="0" cellpadding="0" cellspacing="0" width="480" class="mobile-wrapper">
                 <tr>
                     <td align="center" valign="top" style="padding: 0 0 20px 0;">
@@ -90,8 +90,8 @@ div[style*="margin: 16px 0;"] { margin: 0 !important; }
                 <tr>
                     <td align="center" valign="top" style="font-family: Open Sans, Helvetica, Arial, sans-serif; padding-top: 0;">
 
-                        <p style="color: #b7bdc9; font-size: 16px; line-height: 24px; margin: 0;">
-                          Mandeville carneiro robbins goas ross kelly ragan rodriguez stig jordan hodgekiss merlin yeaman mandeville carneiro robbins goas ross kelly ragan rodriguez stig jordan hodgekiss merlin yeaman
+                        <p style="color: #b7bdc9; font-color: black; font-size: 16px; line-height: 24px; margin: 0;">
+                          Dear <span style="color: black">{{guest_email}}</span>, you are cordially invited to attend {{event.name}}! Invited by {{owner_email}}, powered by Salonniere. 
                         </p>
 
                     </td>
@@ -100,8 +100,9 @@ div[style*="margin: 16px 0;"] { margin: 0 !important; }
                     <td align="center" style="padding: 25px 0 0 0;">
                         <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td align="center" style="border-radius: 28px;" bgcolor="#75b6c9">
-                                    <a href="http://litmus.com" target="_blank" style="font-size: 18px; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 28px; background-color: #75b6c9; padding: 16px 28px; border: 1px solid #75b6c9; display: block;">RSVP now &rarr;</a>
+                                <td align="center">
+                                    <a href="http://m.me/SalonniereAI" target="_blank" style="font-size: 18px; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 28px; background-color: #0084ff; padding: 16px 28px; border: 1px solid white; display: block;">RSVP on Messenger &rarr;</a>
+
                                 </td>
                             </tr>
                         </table>
@@ -121,14 +122,15 @@ div[style*="margin: 16px 0;"] { margin: 0 !important; }
                 <tr>
                     <td align="center" valign="top" style="padding: 0; font-family: Open Sans, Helvetica, Arial, sans-serif; color: #999999;">
                         <p style="font-size: 14px; line-height: 20px;">
-                          675 Massachusetts Avenue<br>
-                          Cambridge, MA 02139
+                          Salonniere<br>
+                          Intelligent Event Planner <br>
+                          Berkeley, CA <br>
 
                           <br><br>
 
-                          <a href="http://litmus.com" style="color: #999999;" target="_blank">View Online</a>
-                          &nbsp; &bull; &nbsp;
-                          <a href="http://litmus.com" style="color: #999999;" target="_blank">Unsubscribe</a>
+                          <a href="http://salonniere.herokuapp.com" style="color: #999999;" target="_blank">Learn More</a>
+                          <!-- &nbsp; &bull; &nbsp;
+                          <a href="http://salonniere.herokuapp.com/unsubscribe" style="color: #999999;" target="_blank">Unsubscribe</a> -->
                         </p>
                     </td>
                 </tr>
