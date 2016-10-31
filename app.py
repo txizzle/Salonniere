@@ -23,7 +23,7 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True)
-    events = db.relationship('Event')
+    events = db.relationship('Event', backref='owner')
 
     def __init__(self, email):
         self.email = email
@@ -36,8 +36,6 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(240))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    owner = db.relationship('users', foreign_keys='events.owner_id')
 
     def __init__(self, owner_email, name):
         self.owner_id = User.query.filter(User.email.match(owner_email))[0].id
