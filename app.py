@@ -341,7 +341,7 @@ def webhook():
                     # Hardcoding 'reset' for testing purposes
                     if message_text.lower() == 'reset':
                         new_context = initial_context = str({"fb_id": sender_id})
-                        send_message('Resetting context for testing')
+                        send_message(sender_id, 'Resetting context for testing')
                     else:
                         new_context = client.run_actions(sender_id, message_text, old_context)
 
