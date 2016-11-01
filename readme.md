@@ -21,6 +21,7 @@ $ pip install Flask-SQLAlchemy
 $ pip install gunicorn
 $ pip install Flask-Heroku
 $ pip install wit
+$ pip install flask-mail
 ```
 
 2. Install [Postgress.app](http://postgresapp.com/).
