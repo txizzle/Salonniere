@@ -48,7 +48,7 @@ Uncomment line 12 in app.py (`# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgre
 5. Run it!
 Try running `python app.py` and go to `localhost:5000/signup` and after inputting an email verify that it shows up in `localhost:5000/users`. 
 
-6. To deploy to Heroku, undo step 3. You'll need to install the Heroku toolbelt and link it to your account, which should have access to our Heroku app (salonneire.herokuapp.com)
+6. To deploy to Heroku, undo step 3. You'll need to install the Heroku toolbelt and link it to your account, which should have access to our Heroku app (salonniere.herokuapp.com)
 
 
 
