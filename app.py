@@ -103,15 +103,22 @@ def setEventInvites(request):
     event_invites = _get_entity_values(entities, 'email')
     print(event_invites)
 
+    # Get Event fields from context
     owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
+
+    # Add Event to database
     reg = Event(owner_fb_id, name, location=location, food=food)
     db.session.add(reg)
+    db.session.commit()
+
+    # Add invite token to event
+    new_event.token = generate_token(new_event.id)
     db.session.commit()
 
     for guest_email in event_invites:
         event = db.session.query(Event).get(event_id)
         # month, day = parse_datetime(event.start_time)
-        month, day = 'N O V', '5' # TODO: HARDCODED IN DATETIME. ADD TO WIT AI
+        month, day = 'N O V', '5' # TODO: HARDCODED IN DATE. ADD TO WIT AI
         send_email('You\'re Invited!',
                     'salonniere.ai@gmail.com',
                     guest_email,
