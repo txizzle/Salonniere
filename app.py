@@ -22,8 +22,8 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 # Setup PostgreSQL Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
-# heroku = Heroku(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
+heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 #if len(sys.argv) != 2:
