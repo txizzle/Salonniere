@@ -1,7 +1,7 @@
 # Salonniere Intelligent Event Organizer
 Salonniere is an intelligent event organizer built for UC Berkeley's Chatbot Collider in Fall 2016. 
 
-Salonniere's [Webpage](http://salonneire.herokuapp.com/)
+Salonniere's [Webpage](http://salonniere.herokuapp.com/)
 Salonniere's [Facebook Page](https://www.facebook.com/SalonniereAI/)
 
 # This repository
@@ -29,15 +29,17 @@ Add this to your .bash_profile (*This is different from the guide because the la
 `export PATH="/Applications/Postgres.app/Contents/Versions/9.6/bin:$PATH"`
 
 Run the downloaded app. Then, create a new database (for the main database I used locally, I called it `all-users`). In terminal, run: 
-`$ createdb all-users`. 
+`$ createdb main`. 
 
 You can verify that the database was created by running `=# \list` in psql (the downloaded App's terminal, or running psql in the terminal). If your database was created succesfully, you should see a database with the name `all-users`. 
 
 3. Create database based off the model.
-`$ python
+```
+$ python
 >>> from app import db
 >>> db.create_all()
->>> exit()`
+>>> exit()
+```
 
 4. Add DB URL to app.py
 Uncomment line 12 in app.py (`# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/all-users'`) to let Flask know where the postgresql database is. Comment out line 14 (`heroku = Heroku(app)`).

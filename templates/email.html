@@ -19,16 +19,17 @@
     <div class="container-full">
         <div class="row">
             <div class="col-lg-12 text-center v-center">
-                <h1>Create Event as User</h1>
-                <p class="lead">Test page for creating a new event</p>
+                <h1>Send Email Invitation</h1>
+                <p class="lead">Test page for sending an email</p>
                 <br>
                 <br>
                 <br>
-                <form class="col-lg-12" action="{{url_for('events_prereg')}}" method="POST">
+                <form class="col-lg-12" action="{{url_for('send_invite')}}" method="POST">
                     <div class="input-group" style="width:340px;text-align:center;margin:0 auto;">
                         <input class="form-control input-lg" title="Don't worry. We hate spam, and will not share your email with anyone." placeholder="Enter your email address" type="email" name="owner_email">
-                        <input class="form-control input-lg" title="Give this event a fancy name." placeholder="Fancy Name" name="name">
-                        <input type="datetime" class="form-control input-lg" title="Event Date" name="start_time">
+                        <input class="form-control input-lg" title="Event ID" placeholder="event id" name="event_id">
+                        <input class="form-control input-lg" title="Guest Email" placeholder="guest email" name="guest_email">
+
                         <span class="input-group-btn"><button class="btn btn-lg btn-primary" type="submit">Add</button></span>
                     </div>
                 </form>

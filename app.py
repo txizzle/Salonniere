@@ -8,15 +8,22 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_heroku import Heroku
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
-#app.config['SQLALCHEMY_BINDS'] = {
-#    'users': 'postgresql://localhost/all-users',
-#    'events': 'postgresql://localhost/all-events'
-#}
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# heroku = Heroku(app)
+
+# Setup Flask-Mail
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'salonniere.ai@gmail.com'
+app.config['MAIL_PASSWORD'] = 'chatbotcollider'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
+# Setup PostgreSQL Database
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
+heroku = Heroku(app)
 db = SQLAlchemy(app)
 
 if len(sys.argv) != 2:
@@ -92,6 +99,7 @@ client = Wit(access_token=access_token, actions=actions)
 client.interactive() # comment this line to turn off interactive mode
 
 # Create our database model
+# User model
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -104,40 +112,64 @@ class User(db.Model):
     def __repr__(self):
         return '<E-mail %r>' % self.email
 
+# Event model
 class Event(db.Model):
+    # An Event consists of an event name, owner, event type, event location,
+    #   starting time, end time, expected guests, attire, and other attributes.
     __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(240))
+    event_type = db.Column(db.String(240))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    location = db.Column(db.String(240))
+    start_time = db.Column(db.DateTime(timezone=False)) # May need to set timezone=True in the future
+    end_time = db.Column(db.DateTime(timezone=False))
+    num_guests = db.Column(db.Integer)
+    attire = db.Column(db.String(240))
+    other = db.Column(db.String(2400)) # Store dictionary as JSON String. Better way: Store a pickled dictionary as a db.Blob
+    token = db.Column(db.String(240))
 
-    def __init__(self, owner_email, name):
+    def __init__(self, owner_email, name, event_type=None, location=None, start_time=None, end_time=None,
+        num_guests=None, attire=None, other=None, token=None):
         self.owner_id = User.query.filter(User.email.match(owner_email))[0].id
         self.name = name
-
+        self.event_type = event_type
+        self.location = location
+        self.start_time = start_time
+        self.end_time = end_time
+        self.num_guests = num_guests
+        self.attire = attire
+        self.other = other
+        self.token = token
     def __repr__(self):
-        return '<Name % Owner %r>' % (self.name, self.owner.email)
+        return ('<Name %r> <Owner %r> <Event Type %r> <Location %r> <Start Time %r> <End Time %r> <Guests %r> <Attire %r> <Other %r>'
+            % (self.name, self.owner.email, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
 
+# Index route for main landing page
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
+# View to list Users table
 @app.route('/users', methods=['GET'])
 def users_index():
     return render_template(
        'users.html',
        users=User.query.all())
 
+# View to list Events table
 @app.route('/events', methods=['GET'])
 def events_index():
     return render_template(
         'events.html',
         events=Event.query.all())
 
+# View to signup a new User
 @app.route('/signup', methods=['GET'])
 def signup_index():
     return render_template('signup_index.html')
 
-# Created for testing purposes only
+# View to create a new Event with an existing User
 @app.route('/create_event', methods=['GET'])
 def create_event_index():
     return render_template('event_signup_index.html')
@@ -163,13 +195,67 @@ def events_prereg():
     if request.method == 'POST':
         owner_email = request.form['owner_email']
         name = request.form['name']
+        start_time = request.form['start_time']
         # Check that the owner is a real user
+        # TODO: If not, should we register them as a new user?
         if db.session.query(User).filter(User.email == owner_email).count():
-            reg = Event(owner_email, name)
+            reg = Event(owner_email, name, start_time=start_time)
             db.session.add(reg)
             db.session.commit()
+            new_event = db.session.query(Event).filter(Event.name == name).first()
+            new_event.token = generate_token(new_event.id)
+            db.session.commit()
             return render_template('success.html')
+        else:
+            return render_template('fail.html')
     return render_template('index.html')
+
+# Helper function to generate a 3 word unique token per event.
+def generate_token(id):
+    animals = ['albatross', 'beaver', 'cougar', 'cow', 'elephant', 'fox', 'horse', 'hyena', 'lion', 'monkey', 'penguin', 'ram', 'wolf', 'zebra']
+    token = ''
+    mod_values = [2, 5]
+    for mod in mod_values:
+        token += animals[(17*(id % mod)) % len(animals)]
+        token += ' '
+    token += str(13*id % 29)
+    return token
+
+@app.route('/email')
+def email_index():
+    return render_template('email.html')
+
+# Test route to send an email
+@app.route('/send_invite', methods=['POST'])
+def send_invite():
+    owner_email, event_id, guest_email = None, None, None
+    if request.method == 'POST':
+        owner_email = request.form['owner_email']
+        event_id = request.form['event_id']
+        guest_email= request.form['guest_email']
+        if db.session.query(User).filter(User.email == owner_email).count() and db.session.query(Event).filter(Event.id == event_id).count():
+            event = db.session.query(Event).get(event_id)
+            month, day = parse_datetime(event.start_time)
+            send_email('You\'re Invited!',
+                        'salonniere.ai@gmail.com',
+                        guest_email,
+                        # render_template("follower_email.txt", user=followed, follower=follower),
+                        'Test message body from Salonniere',
+                        render_template("invitation_email.html", owner_email=owner_email, guest_email=guest_email, event=event, month=month, day=day))
+            return render_template('success.html')
+        else:
+            return render_template('fail.html')
+    return render_template('index.html')
+
+def send_email(subject, sender, recipient, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=[recipient])
+    msg.body = text_body
+    msg.html = html_body
+    mail.send(msg)
+
+def parse_datetime(d):
+    months = ['J A N', 'F E B', 'M A R', 'A P R', 'M A Y', 'J U N', 'J U L', 'A U G', 'S E P', 'O C T', 'N O V', 'D E C']
+    return (months[d.month - 1], str(d.day))
 
 @app.route('/facebook/webhook/', methods=['GET'])
 def verify():

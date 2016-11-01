@@ -1,9 +1,31 @@
 <h3>Events</h3>
     <table>
+    	<tr>
+            <th>Event Name</th>
+            <th>Event ID</th>
+            <th>Owner</th>
+            <th>Event Type</th>
+            <th>Location</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Number of Guests</th>
+            <th>Attire</th>
+            <th>Token</th>
+            <th>Other</th>
+        </tr>
     {%- for event in events %}
         <tr>
             <td>{{ event.name }}</td>
+            <td>{{ event.id }}</td>
             <td>{{ event.owner.email }}</td>
+            <td>{{ event.event_type }}</td>
+            <td>{{ event.location }}</td>
+            <td>{{ event.start_time }}</td>
+            <td>{{ event.end_time }}</td>
+            <td>{{ event.num_guests }}</td>
+            <td>{{ event.attire }}</td>
+            <td>{{ event.token }}</td>
+            <td>{{ event.other }}</td>
         </tr>
     {%- endfor %}
 </table>
