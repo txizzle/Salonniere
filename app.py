@@ -307,7 +307,8 @@ def webhook():
                         db.session.commit()
 
                     # wit_resp = client.message(message_text)
-                    wit_resp = client.run_actions(str(int(sender_id) + 6), message_text, {"fb_id": sender_id})
+                    new_context = client.run_actions(str(int(sender_id) + 7), message_text, {"fb_id": sender_id})
+                    wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
                     if 'msg' in wit_resp:
                         send_message(sender_id, wit_resp['msg'])
