@@ -314,7 +314,7 @@ def webhook():
                         db.session.commit()
 
                     # wit_resp = client.message(message_text)
-                    new_context = client.run_actions(str(int(sender_id) + 8), message_text, {"fb_id": sender_id})
+                    new_context = client.run_actions(sender_id, message_text, {"fb_id": sender_id})
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
                     log(new_context)
