@@ -22,14 +22,14 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 # Setup PostgreSQL Database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
-heroku = Heroku(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
+# heroku = Heroku(app)
 db = SQLAlchemy(app)
 
-if len(sys.argv) != 2:
-    print('usage: python ' + sys.argv[0] + ' <wit-token>')
-    exit(1)
-access_token = sys.argv[1]
+#if len(sys.argv) != 2:
+#    print('usage: python ' + sys.argv[0] + ' <wit-token>')
+#    exit(1)
+access_token = "GCBTBJWTLXQBY6AFODUPLEBANMDTWMZ7"
 
 # convenience function
 def _get_entity_value(entities, entity):
@@ -54,6 +54,8 @@ def setEventType(request):
     event_type = _get_entity_value(entities, 'intent')
     if event_type == 'party':
         context['party'] = True
+        # set this for when we create the event
+        context['eventType'] = 'party'
     else:
         context['invalidEvent'] = True
         if context.get('party') is not None:
@@ -65,8 +67,9 @@ def setEventLocation(request):
     entities = request['entities']
     event_location = _get_entity_value(entities, 'location')
     if event_location:
-        # TODO: set internal event location
         context['known-location'] = True
+        # set internal event location for later use
+        context['eventLocation'] = event_location
     else:
         context['unknown-location'] = True
         if context.get('known-location'):
@@ -77,7 +80,8 @@ def setEventFood(request):
     context = request['context']
     entities = request['entities']
     event_food = _get_entity_value(entities, 'intent')
-    # TODO: set internal event food
+    # set internal event food for later use
+    context['eventFood'] = event_food
     return context
 
 def setEventInvites(request):
@@ -96,21 +100,23 @@ actions = {
 }
 
 client = Wit(access_token=access_token, actions=actions)
-client.interactive() # comment this line to turn off interactive mode
+# client.interactive() # comment this line to turn off interactive mode
 
 # Create our database model
 # User model
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
+    fb_id = db.Column(db.String(120), unique=True)
     email = db.Column(db.String(120), unique=True)
     events = db.relationship('Event', backref='owner')
 
-    def __init__(self, email):
+    def __init__(self, fb_id, email=None):
+        self.fb_id = fb_id
         self.email = email
 
     def __repr__(self):
-        return '<E-mail %r>' % self.email
+        return '<Facebook ID %r>' % self.fb_id
 
 # Event model
 class Event(db.Model):
@@ -129,9 +135,9 @@ class Event(db.Model):
     other = db.Column(db.String(2400)) # Store dictionary as JSON String. Better way: Store a pickled dictionary as a db.Blob
     token = db.Column(db.String(240))
 
-    def __init__(self, owner_email, name, event_type=None, location=None, start_time=None, end_time=None,
+    def __init__(self, owner_fb_id, name, event_type=None, location=None, start_time=None, end_time=None,
         num_guests=None, attire=None, other=None, token=None):
-        self.owner_id = User.query.filter(User.email.match(owner_email))[0].id
+        self.owner_id = User.query.filter(User.fb_id.match(owner_fb_id))[0].id
         self.name = name
         self.event_type = event_type
         self.location = location
@@ -143,7 +149,7 @@ class Event(db.Model):
         self.token = token
     def __repr__(self):
         return ('<Name %r> <Owner %r> <Event Type %r> <Location %r> <Start Time %r> <End Time %r> <Guests %r> <Attire %r> <Other %r>'
-            % (self.name, self.owner.email, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
+            % (self.name, self.owner.fb_id, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
 
 # Index route for main landing page
 @app.route('/', methods=['GET'])
@@ -177,12 +183,13 @@ def create_event_index():
 # Save e-mail to database and send to success page
 @app.route('/prereg', methods=['POST'])
 def prereg():
-    email = None
+    fb_id = None
     if request.method == 'POST':
-        email = request.form['email']
-        # Check that email does not already exist (not a great query, but works)
-        if not db.session.query(User).filter(User.email == email).count():
-            reg = User(email)
+        fb_id = request.form['fb_id']
+        print(fb_id)
+        # Check that facebook id does not already exist (not a great query, but works)
+        if not db.session.query(User).filter(User.fb_id == fb_id).count():
+            reg = User(fb_id)
             db.session.add(reg)
             db.session.commit()
             return render_template('success.html')
@@ -190,16 +197,16 @@ def prereg():
 
 @app.route('/events_prereg', methods=['POST'])
 def events_prereg():
-    owner_email = None
+    owner_fb_id = None
     name = None
     if request.method == 'POST':
-        owner_email = request.form['owner_email']
+        owner_fb_id = request.form['owner_fb_id']
         name = request.form['name']
         start_time = request.form['start_time']
         # Check that the owner is a real user
         # TODO: If not, should we register them as a new user?
-        if db.session.query(User).filter(User.email == owner_email).count():
-            reg = Event(owner_email, name, start_time=start_time)
+        if db.session.query(User).filter(User.fb_id == owner_fb_id).count():
+            reg = Event(owner_fb_id, name, start_time=start_time)
             db.session.add(reg)
             db.session.commit()
             new_event = db.session.query(Event).filter(Event.name == name).first()
@@ -228,12 +235,12 @@ def email_index():
 # Test route to send an email
 @app.route('/send_invite', methods=['POST'])
 def send_invite():
-    owner_email, event_id, guest_email = None, None, None
+    owner_fb_id, event_id, guest_email = None, None, None
     if request.method == 'POST':
-        owner_email = request.form['owner_email']
+        owner_fb_id = request.form['owner_fb_id']
         event_id = request.form['event_id']
         guest_email= request.form['guest_email']
-        if db.session.query(User).filter(User.email == owner_email).count() and db.session.query(Event).filter(Event.id == event_id).count():
+        if db.session.query(User).filter(User.fb_id == owner_fb_id).count() and db.session.query(Event).filter(Event.id == event_id).count():
             event = db.session.query(Event).get(event_id)
             month, day = parse_datetime(event.start_time)
             send_email('You\'re Invited!',
@@ -241,7 +248,7 @@ def send_invite():
                         guest_email,
                         # render_template("follower_email.txt", user=followed, follower=follower),
                         'Test message body from Salonniere',
-                        render_template("invitation_email.html", owner_email=owner_email, guest_email=guest_email, event=event, month=month, day=day))
+                        render_template("invitation_email.html", owner_email=owner_fb_id, guest_email=guest_email, event=event, month=month, day=day))
             return render_template('success.html')
         else:
             return render_template('fail.html')
