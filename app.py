@@ -237,10 +237,9 @@ def events_prereg():
 
 # Helper function to generate a 3 word unique token per event.
 def generate_token(id):
-    animals = ['albatross', 'beaver', 'cougar', 'cow', 'elephant', 'fox', 'horse', 'hyena', 'lion', 'monkey', 'penguin', 'ram', 'wolf', 'zebra']
+    animals = ['albatross', 'beaver', 'cougar', 'elephant', 'fox', 'hyena', 'lion', 'lynx', 'penguin', 'ram', 'wolf', 'zebra']
     token = ''
-    mod_values = [2, 5]
-    for mod in mod_values:
+    for _ in range(2):
         token += animals[randint(0,len(animals)-1)]
         token += ' '
     token += str(13*id % 29)
@@ -321,6 +320,14 @@ def webhook():
                     # wit_resp = client.message(message_text)
                     new_context = client.run_actions(sender_id, message_text, {"fb_id": sender_id})
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
+                    
+                    if 'eventType' in next_context:
+                        reg = Event(sender_id, 'Test Event from Code')
+                        db.session.add(reg)
+                        db.session.commit()
+                        new_event = db.session.query(Event).filter(Event.name == name).first()
+                        new_event.token = generate_token(new_event.id)
+                        db.session.commit()
                     
                     log(new_context)
                     # if 'msg' in wit_resp:
