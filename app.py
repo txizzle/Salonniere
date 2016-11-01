@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from random import randint
 from wit import Wit
 
 import requests
@@ -228,7 +229,7 @@ def generate_token(id):
     token = ''
     mod_values = [2, 5]
     for mod in mod_values:
-        token += animals[(17*(id % mod)) % len(animals)]
+        token += animals[randint(0,len(animals)-1)]
         token += ' '
     token += str(13*id % 29)
     return token
@@ -306,7 +307,7 @@ def webhook():
                         db.session.commit()
 
                     # wit_resp = client.message(message_text)
-                    wit_resp = client.converse(sender_id, message_text, {"fb_id": sender_id})
+                    wit_resp = client.converse(sender_id, message_text, {"fb_id": str(int(sender_id) + 5)})
                     
                     if 'msg' in wit_resp:
                         send_message(sender_id, wit_resp['msg'])
