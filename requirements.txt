@@ -12,3 +12,4 @@ requests==2.10.0
 simplejson==3.10.0
 Flask-Mail==0.9.1 
 blinker==1.4
+wit==4.1.0
