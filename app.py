@@ -107,7 +107,7 @@ def setEventInvites(request):
     reg = Event(owner_fb_id, name, location=location, food=food)
     db.session.add(reg)
     db.session.commit()
-    
+
     for guest_email in event_invites:
         event = db.session.query(Event).get(event_id)
         # month, day = parse_datetime(event.start_time)
@@ -338,39 +338,18 @@ def webhook():
                     log('Old Context: ')
                     log(old_context)
 
-                    # wit_resp = client.message(message_text)
-                    new_context = client.run_actions(sender_id, message_text, old_context)
-                    # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
-                    
+                    # Hardcoding 'reset' for testing purposes
+                    if message_text.lower() == 'reset':
+                        new_context = initial_context = str({"fb_id": sender_id})
+                        send_message('Resetting context for testing')
+                    else:
+                        new_context = client.run_actions(sender_id, message_text, old_context)
+
                     # Save context
                     current_user.context = str(new_context)
 
                     log('New Context: ')
                     log(new_context)
-
-                    if 'eventType' in new_context:
-                        reg = Event(sender_id, 'Test Event from Code 3')
-                        db.session.add(reg)
-                        db.session.commit()
-                        owner_id = User.query.filter(User.fb_id.match(sender_id))[0].id
-                        new_event = db.session.query(Event).filter(Event.owner_id == owner_id).first() #owner_id is the table ID, DIFFERENT from User.fb_id!
-                        new_event.token = generate_token(new_event.id)
-                        db.session.commit()
-
-                    # if 'msg' in wit_resp:
-                    #     send_message(sender_id, wit_resp['msg'])
-                    # else:
-                    #     log(wit_resp)
-                    #     send_message(sender_id, 'Sorry, I couldn\'t quite catch that. Could you rephrase that?')
-
-                    #if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
-                    #    send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
-
-                    #elif'ted' in message_text.lower():
-                    #    send_message(sender_id, "Ted is a god.")
-
-                    #else:
-                    #    send_message(sender_id, "idk how to respond to that... o.o")
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
