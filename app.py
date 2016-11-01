@@ -88,7 +88,11 @@ def setEventInvites(request):
     context = request['context']
     entities = request['entities']
     event_invites = _get_entity_values(entities, 'email')
-    # TODO: set internal event invites
+    # TODO: send out email invites
+    owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
+    reg = Event(fb_id, name, location=location, food=food)
+    db.session.add(reg)
+    db.session.commit()
     return context
 
 actions = {
@@ -128,6 +132,7 @@ class Event(db.Model):
     event_type = db.Column(db.String(240))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     location = db.Column(db.String(240))
+    food = db.Column(db.String(240))
     start_time = db.Column(db.DateTime(timezone=False)) # May need to set timezone=True in the future
     end_time = db.Column(db.DateTime(timezone=False))
     num_guests = db.Column(db.Integer)
@@ -135,7 +140,7 @@ class Event(db.Model):
     other = db.Column(db.String(2400)) # Store dictionary as JSON String. Better way: Store a pickled dictionary as a db.Blob
     token = db.Column(db.String(240))
 
-    def __init__(self, owner_fb_id, name, event_type=None, location=None, start_time=None, end_time=None,
+    def __init__(self, owner_fb_id, name, event_type=None, location=None, food=None, start_time=None, end_time=None,
         num_guests=None, attire=None, other=None, token=None):
         self.owner_id = User.query.filter(User.fb_id.match(owner_fb_id))[0].id
         self.name = name
@@ -295,16 +300,23 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
 
+                    # if the user doesn't exist, add them to the db
+                    if db.session.query(User).filter(User.fb_id == sender_id).count() == 0:
+                        db.session.add(User(sender_id))
+                        db.session.commit()
+
                     # wit_resp = client.message(message_text)
+                    wit_resp = client.converse(sender_id, message_text, {"fb_id": sender_id})
+                    send_message(sender_id, wit_resp)
 
-                    if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
-                        send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
+                    #if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
+                    #    send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
 
-                    elif'ted' in message_text.lower():
-                        send_message(sender_id, "Ted is a god.")
+                    #elif'ted' in message_text.lower():
+                    #    send_message(sender_id, "Ted is a god.")
 
-                    else:
-                        send_message(sender_id, "idk how to respond to that... o.o")
+                    #else:
+                    #    send_message(sender_id, "idk how to respond to that... o.o")
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
