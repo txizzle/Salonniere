@@ -334,7 +334,7 @@ def webhook():
                     current_user.context = str(new_context)
 
                     log('New Context: ')
-                    log(next_context)
+                    log(new_context)
 
                     if 'eventType' in new_context:
                         reg = Event(sender_id, 'Test Event from Code 3')
