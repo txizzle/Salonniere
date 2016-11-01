@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import ast
 from random import randint
 from wit import Wit
 
@@ -126,14 +127,16 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fb_id = db.Column(db.String(120), unique=True)
     email = db.Column(db.String(120), unique=True)
+    context = db.Column(db.String(480)) # str representation of context dict
     events = db.relationship('Event', backref='owner')
 
-    def __init__(self, fb_id, email=None):
+    def __init__(self, fb_id, email=None, context=None):
         self.fb_id = fb_id
         self.email = email
+        self.context = context
 
     def __repr__(self):
-        return '<Facebook ID %r>' % self.fb_id
+        return '<Facebook ID %r> <Context %r>' % (self.fb_id, self.context)
 
 # Event model
 class Event(db.Model):
@@ -312,17 +315,29 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
 
-                    # if the user doesn't exist, add them to the db
+                    # If the User doesn't exist, add them to the database. Else, find User from database.
                     if db.session.query(User).filter(User.fb_id == sender_id).count() == 0:
-                        db.session.add(User(sender_id))
-                        db.session.commit()
+                        initial_context = str({"fb_id": sender_id})
+                        db.session.add(User(sender_id, context=initial_context))
+                        db.session.commit()    
+                    current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
+                    old_context = ast.literal_eval(current_user.context)
+
+                    log('Old Context: ')
+                    log(old_context)
 
                     # wit_resp = client.message(message_text)
-                    new_context = client.run_actions(sender_id, message_text, {"fb_id": sender_id})
+                    new_context = client.run_actions(sender_id, message_text, old_context)
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
+                    # Save context
+                    current_user.context = str(new_context)
+
+                    log('New Context: ')
+                    log(next_context)
+
                     if 'eventType' in new_context:
-                        reg = Event(sender_id, 'Test Event from Code')
+                        reg = Event(sender_id, 'Test Event from Code 3')
                         db.session.add(reg)
                         db.session.commit()
                         owner_id = User.query.filter(User.fb_id.match(sender_id))[0].id
@@ -330,7 +345,6 @@ def webhook():
                         new_event.token = generate_token(new_event.id)
                         db.session.commit()
 
-                    log(new_context)
                     # if 'msg' in wit_resp:
                     #     send_message(sender_id, wit_resp['msg'])
                     # else:
