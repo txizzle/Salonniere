@@ -322,10 +322,11 @@ def webhook():
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
                     if 'eventType' in new_context:
-                        reg = Event(sender_id, 'Test Event from Code2')
+                        reg = Event(sender_id, 'Test Event from Code')
                         db.session.add(reg)
                         db.session.commit()
-                        new_event = db.session.query(Event).filter(Event.owner_id == sender_id).first()
+                        owner_id = User.query.filter(User.fb_id.match(sender_id))[0].id
+                        new_event = db.session.query(Event).filter(Event.owner_id == owner_id).first() #owner_id is the table ID, DIFFERENT from User.fb_id!
                         new_event.token = generate_token(new_event.id)
                         db.session.commit()
 
