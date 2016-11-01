@@ -321,14 +321,14 @@ def webhook():
                     new_context = client.run_actions(sender_id, message_text, {"fb_id": sender_id})
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
-                    if 'eventType' in next_context:
+                    if 'eventType' in new_context:
                         reg = Event(sender_id, 'Test Event from Code')
                         db.session.add(reg)
                         db.session.commit()
                         new_event = db.session.query(Event).filter(Event.name == name).first()
                         new_event.token = generate_token(new_event.id)
                         db.session.commit()
-                    
+
                     log(new_context)
                     # if 'msg' in wit_resp:
                     #     send_message(sender_id, wit_resp['msg'])
