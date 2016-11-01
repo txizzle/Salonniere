@@ -115,10 +115,10 @@ def setEventInvites(request):
         send_email('You\'re Invited!',
                     'salonniere.ai@gmail.com',
                     guest_email,
-                    # render_template("follower_email.txt", user=followed, follower=follower),
+                    # render_template("follower_email.txt", user=followed, follower=follower), #This is for .txt email body
                     'Test message body from Salonniere',
                     render_template("invitation_email.html", owner_email=owner_fb_id, guest_email=guest_email, event=event, month=month, day=day))
-    return context
+    return context # This might need to change
 
 actions = {
     'send': send,
@@ -340,13 +340,14 @@ def webhook():
 
                     # Hardcoding 'reset' for testing purposes
                     if message_text.lower() == 'reset':
-                        new_context = initial_context = str({"fb_id": sender_id})
+                        new_context = str({"fb_id": sender_id})
                         send_message(sender_id, 'Resetting context for testing')
                     else:
                         new_context = client.run_actions(sender_id, message_text, old_context)
 
                     # Save context
                     current_user.context = str(new_context)
+                    db.session.commit()  
 
                     log('New Context: ')
                     log(new_context)
