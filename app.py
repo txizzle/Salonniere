@@ -103,7 +103,7 @@ def setEventInvites(request):
     print(event_invites)
     # TODO: send out email invites
     owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
-    reg = Event(fb_id, name, location=location, food=food)
+    reg = Event(owner_fb_id, name, location=location, food=food)
     db.session.add(reg)
     db.session.commit()
     return context
