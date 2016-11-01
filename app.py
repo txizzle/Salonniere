@@ -102,11 +102,22 @@ def setEventInvites(request):
     print(entities)
     event_invites = _get_entity_values(entities, 'email')
     print(event_invites)
-    # TODO: send out email invites
+
     owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
     reg = Event(owner_fb_id, name, location=location, food=food)
     db.session.add(reg)
     db.session.commit()
+    
+    for guest_email in event_invites:
+        event = db.session.query(Event).get(event_id)
+        # month, day = parse_datetime(event.start_time)
+        month, day = 'N O V', '5' # TODO: HARDCODED IN DATETIME. ADD TO WIT AI
+        send_email('You\'re Invited!',
+                    'salonniere.ai@gmail.com',
+                    guest_email,
+                    # render_template("follower_email.txt", user=followed, follower=follower),
+                    'Test message body from Salonniere',
+                    render_template("invitation_email.html", owner_email=owner_fb_id, guest_email=guest_email, event=event, month=month, day=day))
     return context
 
 actions = {
@@ -168,6 +179,7 @@ class Event(db.Model):
         self.attire = attire
         self.other = other
         self.token = token
+        self.food = food
     def __repr__(self):
         return ('<Name %r> <Owner %r> <Event Type %r> <Location %r> <Start Time %r> <End Time %r> <Guests %r> <Attire %r> <Other %r>'
             % (self.name, self.owner.fb_id, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
