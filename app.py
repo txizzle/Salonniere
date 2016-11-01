@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from wit import Wit
 
 import requests
 from flask import Flask, render_template, request
@@ -17,6 +18,78 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/main'
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 # heroku = Heroku(app)
 db = SQLAlchemy(app)
+
+if len(sys.argv) != 2:
+    print('usage: python ' + sys.argv[0] + ' <wit-token>')
+    exit(1)
+access_token = sys.argv[1]
+
+# convenience function
+def _get_entity_value(entities, entity):
+    out = _get_entity_values(entities, entity)
+    if out:
+        return out[0]
+
+def _get_entity_values(entities, entity):
+    if entity not in entities:
+        return None
+    vals = list(i['value'] for i in entities[entity])
+    if len(vals) == 0:
+        return None
+    return vals
+
+def send(request, response):
+    print(response['text'])
+
+def setEventType(request):
+    context = request['context']
+    entities = request['entities']
+    event_type = _get_entity_value(entities, 'intent')
+    if event_type == 'party':
+        context['party'] = True
+    else:
+        context['invalidEvent'] = True
+        if context.get('party') is not None:
+            del context['party']
+    return context
+
+def setEventLocation(request):
+    context = request['context']
+    entities = request['entities']
+    event_location = _get_entity_value(entities, 'location')
+    if event_location:
+        # TODO: set internal event location
+        context['known-location'] = True
+    else:
+        context['unknown-location'] = True
+        if context.get('known-location'):
+            del context['known-location']
+    return context
+
+def setEventFood(request):
+    context = request['context']
+    entities = request['entities']
+    event_food = _get_entity_value(entities, 'intent')
+    # TODO: set internal event food
+    return context
+
+def setEventInvites(request):
+    context = request['context']
+    entities = request['entities']
+    event_invites = _get_entity_values(entities, 'email')
+    # TODO: set internal event invites
+    return context
+
+actions = {
+    'send': send,
+    'setEventType': setEventType,
+    'setEventLocation': setEventLocation,
+    'setEventFood': setEventFood,
+    'setEventInvites': setEventInvites
+}
+
+client = Wit(access_token=access_token, actions=actions)
+client.interactive() # comment this line to turn off interactive mode
 
 # Create our database model
 class User(db.Model):
@@ -42,7 +115,7 @@ class Event(db.Model):
         self.name = name
 
     def __repr__(self):
-        return '<Name %r> <Owner %r>' % (self.name, self.owner.email)
+        return '<Name % Owner %r>' % (self.name, self.owner.email)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -128,6 +201,8 @@ def webhook():
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
+
+                    # wit_resp = client.message(message_text)
 
                     if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
                         send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")

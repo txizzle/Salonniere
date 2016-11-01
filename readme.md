@@ -20,6 +20,7 @@ $ pip install psycopg2
 $ pip install Flask-SQLAlchemy
 $ pip install gunicorn
 $ pip install Flask-Heroku
+$ pip install wit
 ```
 
 2. Install [Postgress.app](http://postgresapp.com/).
