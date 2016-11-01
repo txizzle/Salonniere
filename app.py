@@ -49,9 +49,9 @@ def _get_entity_values(entities, entity):
 def send(request, response):
     # print(response['text'])
     fb_id = request['session_id']
-    log(fb_id)
+    # log(fb_id)
     text = response['text']
-    log(text)
+    # log(text)
     # send message
     send_message(fb_id, text)
 
@@ -95,12 +95,12 @@ def setEventFood(request):
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
-    log('Context in setEventInvites')
-    log(context)
-    log('Entities in setEventInvites')
-    log(entities)
+    print('Context in setEventInvites')
+    print(context)
+    print('Entities in setEventInvites')
+    print(entities)
     event_invites = _get_entity_values(entities, 'email')
-    log(event_invites)
+    print(event_invites)
     # TODO: send out email invites
     owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
     reg = Event(fb_id, name, location=location, food=food)
@@ -322,7 +322,7 @@ def webhook():
                     new_context = client.run_actions(sender_id, message_text, {"fb_id": sender_id})
                     # wit_resp = client.converse(str(int(sender_id) + 7), message_text, new_context)
                     
-                    log(new_context)
+                    # log(new_context)
                     # if 'msg' in wit_resp:
                     #     send_message(sender_id, wit_resp['msg'])
                     # else:
