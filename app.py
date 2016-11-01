@@ -95,7 +95,12 @@ def setEventFood(request):
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
+    log('Context in setEventInvites')
+    log(context)
+    log('Entities in setEventInvites')
+    log(entities)
     event_invites = _get_entity_values(entities, 'email')
+    log(event_invites)
     # TODO: send out email invites
     owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
     reg = Event(fb_id, name, location=location, food=food)
