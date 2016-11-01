@@ -307,8 +307,8 @@ def webhook():
 
                     # wit_resp = client.message(message_text)
                     wit_resp = client.converse(sender_id, message_text, {"fb_id": sender_id})
-                    log(wit_resp)
-                    send_message(sender_id, str(wit_resp))
+                    # log(wit_resp)
+                    send_message(sender_id, wit_resp['msg'])
 
                     #if 'hello' in message_text.lower() or 'hi' in message_text.lower() or 'yo' in message_text.lower():
                     #    send_message(sender_id, "Hello! I'm Salonniere, your go-to intelligent event organizer. How can I help you?")
