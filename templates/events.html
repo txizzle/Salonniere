@@ -10,6 +10,7 @@
             <th>End Time</th>
             <th>Number of Guests</th>
             <th>Attire</th>
+            <th>Token</th>
             <th>Other</th>
         </tr>
     {%- for event in events %}
@@ -23,6 +24,7 @@
             <td>{{ event.end_time }}</td>
             <td>{{ event.num_guests }}</td>
             <td>{{ event.attire }}</td>
+            <td>{{ event.token }}</td>
             <td>{{ event.other }}</td>
         </tr>
     {%- endfor %}
