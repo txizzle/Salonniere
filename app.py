@@ -47,7 +47,14 @@ def _get_entity_values(entities, entity):
     return vals
 
 def send(request, response):
-    print(response['text'])
+    # print(response['text'])
+    fb_id = request['session_id']
+    log(fb_id)
+    text = response['text']
+    log(text)
+    # send message
+    send_message(fb_id, text)
+
 
 def setEventType(request):
     context = request['context']
