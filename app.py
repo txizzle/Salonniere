@@ -98,14 +98,17 @@ def setEventFood(request):
 def getEventDetails(request):
     context = request['context']
     entities = request['entities']
-    event_token = _get_entity_value(entities, 'intent')
+    # event_token = _get_entity_value(entities, 'intent')
+    animals = _get_entity_value(entities, 'animal')
+    number = _get_entity_value(entities, 'number')
 
     log('Context in getEventDetails')
     log(context)
     log('Entities in getEventDetails')
     log(entities)
-    log('event_token: ')
-    log(event_token)
+    log('animals: ')
+    log(animals)
+    log(number)
     # Find event in Postgres with event_code
     event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
     # context['event-owner'] = event.owner_id
