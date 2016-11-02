@@ -25,12 +25,25 @@ def text_to_vector(text):
      c.subtract(STOP_WORDS)
      return c
 
-text1 = 'Is the front door open?'
-text2 = 'Can anyone open the front door?'
+def sim(s1, s2):
+    v1 = text_to_vector(s1)
+    v2 = text_to_vector(s2)
+    return get_cosine(v1, v2)
+
+text1 = 'Will there be food?'
+text2 = 'Will food be provided?'
+text3 = 'Will there be vegetarian food options?'
+text4 = 'Can I bring dogs to the event?'
 
 vector1 = text_to_vector(text1)
 vector2 = text_to_vector(text2)
+vector3 = text_to_vector(text3)
+vector4 = text_to_vector(text4)
 
 cosine = get_cosine(vector1, vector2)
+cosine2 = get_cosine(vector1, vector3)
+cosine3 = get_cosine(vector1, vector4)
 
-print('Cosine:', cosine)
+print('The similarity between \"{0}\" and \"{1}\" is:{2}'.format(text1, text2, cosine))
+print('The similarity between \"{0}\" and \"{1}\" is:{2}'.format(text1, text3, cosine2))
+print('The similarity between \"{0}\" and \"{1}\" is:{2}'.format(text1, text4, cosine3))
