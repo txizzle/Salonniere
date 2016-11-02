@@ -142,12 +142,13 @@ def getEventDetails(request):
     # Check if event_token corresponds to a real event with event_code
     if db.session.query(Event).filter(Event.token== event_token.lower()).count():
         event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
-        # context['event-owner'] = event.owner_id
-        context['event-owner'] = 'TEST REPLACE THIS'
+        owner = db.session.query(User).get(event.owner_id)
+        owner_name = owner.first_name + ' ' + owner.last_name
+        context['event-owner'] = owner_name
         context['event-location'] = event.location
         context['event-food'] = event.food
         context['event-token'] = event_token
-        context['valid'] = 'True'
+        context['valid'] = True
     return context
 
 # Returns an answer to a nonessential question. This looks through all questions that
@@ -375,10 +376,10 @@ def events_prereg():
 def generate_token(id):
     animals = ['albatross', 'beaver', 'cougar', 'elephant', 'fox', 'hyena', 'lion', 'lynx', 'penguin', 'ram', 'wolf', 'zebra']
     token = ''
-    for _ in range(2):
-        token += animals[randint(0,len(animals)-1)]
-        token += ' '
     token += str(13*id % 29)
+    for _ in range(2):
+        token += ' '
+        token += animals[randint(0,len(animals)-1)]
     return token
 
 @app.route('/email')
