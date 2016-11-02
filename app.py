@@ -485,6 +485,9 @@ def webhook():
                                 db.session.commit()
                             new_context = str({"fb_id": sender_id})
                             send_message(sender_id, 'Resetting context for testing')
+                        elif message_text.lower() == 'reset convo':
+                            new_context = str({"fb_id": sender_id})
+                            send_message(sender_id, 'Resetting context for testing')
                         else:
                             new_context = client.run_actions(sender_id, message_text, old_context)
 
