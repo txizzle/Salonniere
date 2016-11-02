@@ -104,10 +104,10 @@ def getEventDetails(request):
     log('animals: ')
     log(animals)
     log(number)
-    
+
     event_token = ''
     if animals and number:
-        event_token = animals[0] + ' ' + animals[1] + ' ' + number
+        event_token = animals[0] + ' ' + animals[1] + ' ' + str(number)
 
     log('Context in getEventDetails')
     log(context)
