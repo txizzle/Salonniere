@@ -140,7 +140,7 @@ def getEventDetails(request):
     log(entities)
     
     # Check if event_token corresponds to a real event with event_code
-    if db.session.query(Event).filter(Event.token == event_token.lower()).count():
+    if db.session.query(Event).filter(Event.token== event_token.lower()).count():
         event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
         # context['event-owner'] = event.owner_id
         context['event-owner'] = 'TEST REPLACE THIS'
@@ -148,7 +148,6 @@ def getEventDetails(request):
         context['event-food'] = event.food
         context['event-token'] = event_token
         context['valid'] = 'True'
-    log("detail context: {0}".format(context))
     return context
 
 # Returns an answer to a nonessential question. This looks through all questions that
@@ -480,8 +479,9 @@ def webhook():
                         if message_text.lower() == 'reset':
                             # Delete all events I own
                             sender_uid = current_user.id
-                            db.session.delete(db.session.query(Event).filter(Event.owner_id == sender_uid).first())
-                            db.session.commit()
+                            if db.session.query(Event).filter(Event.owner_id == sender_uid).count():
+                                db.session.delete(db.session.query(Event).filter(Event.owner_id == sender_uid).first())
+                                db.session.commit()
                             new_context = str({"fb_id": sender_id})
                             send_message(sender_id, 'Resetting context for testing')
                         else:
