@@ -3,6 +3,8 @@
     {%- for user in users %}
         <tr>
             <td>{{ user.fb_id }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
             <td>{{ user.context }}</td>
         </tr>
     {%- endfor %}

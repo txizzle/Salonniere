@@ -118,6 +118,7 @@ def setEventInvites(request):
     db.session.commit()
 
     for guest_email in event_invites:
+        owner = db.session.query(User).get(owner_id)
         event = db.session.query(Event).filter(Event.owner_id == owner_id).first()
         # month, day = parse_datetime(event.start_time)
         month, day = 'N O V', '5' # TODO: HARDCODED IN DATE. ADD TO WIT AI
@@ -126,7 +127,7 @@ def setEventInvites(request):
                     guest_email,
                     # render_template("follower_email.txt", user=followed, follower=follower), #This is for .txt email body
                     'Test message body from Salonniere',
-                    render_template("invitation_email.html", owner_email=owner_fb_id, guest_email=guest_email, event=event, month=month, day=day))
+                    render_template("invitation_email.html", owner=owner, guest_email=guest_email, event=event, month=month, day=day))
     return context # This might need to change
 
 actions = {
@@ -146,17 +147,21 @@ class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     fb_id = db.Column(db.String(120), unique=True)
+    first_name = db.Column(db.String(120))
+    last_name = db.Column(db.String(120))
     email = db.Column(db.String(120), unique=True)
     context = db.Column(db.String(480)) # str representation of context dict
     events = db.relationship('Event', backref='owner')
 
-    def __init__(self, fb_id, email=None, context=None):
+    def __init__(self, fb_id, first_name=None, last_name=None, email=None, context=None):
         self.fb_id = fb_id
         self.email = email
         self.context = context
+        self.first_name = first_name
+        self.last_name = last_name
 
     def __repr__(self):
-        return '<Facebook ID %r> <Context %r>' % (self.fb_id, self.context)
+        return '<Facebook ID %r> <First Name %r> <Last Name %r> <Context %r>' % (self.fb_id, self.first_name, self.last_name, self.context)
 
 # Event model
 class Event(db.Model):
@@ -282,6 +287,7 @@ def send_invite():
         event_id = request.form['event_id']
         guest_email= request.form['guest_email']
         if db.session.query(User).filter(User.fb_id == owner_fb_id).count() and db.session.query(Event).filter(Event.id == event_id).count():
+            owner = db.session.query(User).filter(User.fb_id == owner_fb_id).first()
             event = db.session.query(Event).get(event_id)
             month, day = parse_datetime(event.start_time)
             send_email('You\'re Invited!',
@@ -289,7 +295,7 @@ def send_invite():
                         guest_email,
                         # render_template("follower_email.txt", user=followed, follower=follower),
                         'Test message body from Salonniere',
-                        render_template("invitation_email.html", owner_email=owner_fb_id, guest_email=guest_email, event=event, month=month, day=day))
+                        render_template("invitation_email.html", owner=owner, guest_email=guest_email, event=event, month=month, day=day))
             return render_template('success.html')
         else:
             return render_template('fail.html')
@@ -342,8 +348,17 @@ def webhook():
 
                         # If the User doesn't exist, add them to the database. Else, find User from database.
                         if db.session.query(User).filter(User.fb_id == sender_id).count() == 0:
+                            params = {
+                                "access_token": os.environ["PAGE_ACCESS_TOKEN"]
+                            }
+
+                            r = requests.post("https://graph.facebook.com/v2.8/" + sender_id, params=params))
+                            response = ast.literal_eval(r.text)
+
+                            first_name, last_name = response['first_name'], response['last_name']
                             initial_context = str({"fb_id": sender_id})
-                            db.session.add(User(sender_id, context=initial_context))
+
+                            db.session.add(User(sender_id, first_name=first_name, last_name=last_name, context=initial_context))
                             db.session.commit()    
                         current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
                         old_context = ast.literal_eval(current_user.context)
