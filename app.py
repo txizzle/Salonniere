@@ -158,9 +158,9 @@ def findYelpSuggestions(request):
                     "url": businesses[0][3],
                     "title": "web url"
                 }, {
-                    "type": "web_url",
-                    "url": "https://www.google.com",
-                    "title": "Google"
+                    "type": "postback",
+                    "title": "Postback",
+                    "payload": business[0][4],
                 }],
             }, {
                 "title": businesses[1][0],
@@ -171,9 +171,9 @@ def findYelpSuggestions(request):
                     "url": businesses[1][3],
                     "title": "web url"
                 }, {
-                    "type": "web_url",
-                    "url": "https://www.google.com",
-                    "title": "Google"
+                    "type": "postback",
+                    "title": "Postback",
+                    "payload": business[0][4],
                 }],
             }, {
                 "title": businesses[2][0],
@@ -184,9 +184,9 @@ def findYelpSuggestions(request):
                     "url": businesses[2][3],
                     "title": "web url"
                 }, {
-                    "type": "web_url",
-                    "url": "https://www.google.com",
-                    "title": "Google"
+                    "type": "postback",
+                    "title": "Postback",
+                    "payload": business[0][4],
                 }],
             }, {
                 "title": businesses[3][0],
@@ -197,9 +197,9 @@ def findYelpSuggestions(request):
                     "url": businesses[3][3],
                     "title": "web url"
                 }, {
-                    "type": "web_url",
-                    "url": "https://www.google.com",
-                    "title": "Google"
+                    "type": "postback",
+                    "title": "Postback",
+                    "payload": business[0][4],
                 }],
             }]
         }
@@ -604,7 +604,10 @@ def webhook():
                     pass
 
                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
-                    pass
+                    sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
+                    recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+                    payload = messaging_event["postback"]["payload"]
+                    send_message(sender_id, 'Payload received: ' + str(payload))
 
     return "ok", 200
 
