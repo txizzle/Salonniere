@@ -116,12 +116,15 @@ def getEventDetails(request):
     log('Entities in getEventDetails')
     log(entities)
     
-    # Find event in Postgres with event_code
-    event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
-    # context['event-owner'] = event.owner_id
-    context['event-owner'] = 'TEST REPLACE THIS'
-    context['event-location'] = event.location
-    context['event-food'] = event.food
+    # Check if event_token corresponds to a real event with event_code
+    if db.session.query(Event).filter(Event.token== event_token.lower()).count()
+        event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
+        # context['event-owner'] = event.owner_id
+        context['event-owner'] = 'TEST REPLACE THIS'
+        context['event-location'] = event.location
+        context['event-food'] = event.food
+        context['event-token'] = event_token
+        context['valid'] = 'True'
     return context
 
 def setEventInvites(request):
