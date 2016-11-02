@@ -141,7 +141,7 @@ def findYelpSuggestions(request):
     log(results)
     businesses = []
     for bus in results.businesses:
-        businesses.append([bus.name, bus.image_url, bus.url, bus.location.address])
+        businesses.append([bus.name, bus.snippet_text, bus.image_url, bus.url, bus.location.address])
 
     log('businesses')
     log(businesses)
@@ -151,11 +151,11 @@ def findYelpSuggestions(request):
             "template_type": "generic",
             "elements": [{
                 "title": businesses[0][0],
-                "subtitle": "Element #1 of an hscroll",
-                "image_url": businesses[0][1],
+                "subtitle": businesses[0][1],
+                "image_url": businesses[0][2],
                 "buttons": [{
                     "type": "web_url",
-                    "url": businesses[0][2],
+                    "url": businesses[0][3],
                     "title": "web url"
                 }, {
                     "type": "web_url",
@@ -163,13 +163,43 @@ def findYelpSuggestions(request):
                     "title": "Google"
                 }],
             }, {
-                "title": "Second Suggestion",
-                "subtitle": "Element #2 of an hscroll",
-                "image_url": businesses[1][1],
+                "title": businesses[1][0],
+                "subtitle": businesses[1][1],
+                "image_url": businesses[1][2],
                 "buttons": [{
-                    "type": "postback",
-                    "title": "Postback",
-                    "payload": "Payload for second element in a generic bubble",
+                    "type": "web_url",
+                    "url": businesses[1][3],
+                    "title": "web url"
+                }, {
+                    "type": "web_url",
+                    "url": "https://www.google.com",
+                    "title": "Google"
+                }],
+            }, {
+                "title": businesses[2][0],
+                "subtitle": businesses[2][1],
+                "image_url": businesses[2][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[2][3],
+                    "title": "web url"
+                }, {
+                    "type": "web_url",
+                    "url": "https://www.google.com",
+                    "title": "Google"
+                }],
+            }, {
+                "title": businesses[3][0],
+                "subtitle": businesses[3][1],
+                "image_url": businesses[3][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[3][3],
+                    "title": "web url"
+                }, {
+                    "type": "web_url",
+                    "url": "https://www.google.com",
+                    "title": "Google"
                 }],
             }]
         }
