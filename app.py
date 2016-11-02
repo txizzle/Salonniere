@@ -106,9 +106,11 @@ def getEventDetails(request):
     log(number)
 
     event_token = ''
-    if animals and number:
+    if animals and len(animals) == 2 and number:
         event_token = animals[0] + ' ' + animals[1] + ' ' + str(number)
 
+    log('Event token')
+    log(event_token)
     log('Context in getEventDetails')
     log(context)
     log('Entities in getEventDetails')
