@@ -99,8 +99,11 @@ def getEventDetails(request):
     context = request['context']
     entities = request['entities']
     # event_token = _get_entity_value(entities, 'intent')
-    animals = _get_entity_value(entities, 'animal')
+    animals = _get_entity_values(entities, 'animal')
     number = _get_entity_value(entities, 'number')
+    event_token = ''
+    if animals and number:
+        event_token = animals[0] + ' ' + animals[1] + ' ' + number
 
     log('Context in getEventDetails')
     log(context)
