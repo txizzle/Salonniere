@@ -137,11 +137,11 @@ def findYelpSuggestions(request):
 
     yelp_client = Client(yelp_auth)
     results = yelp_client.search(search_location, **search_params)
-    log('Yelp Results: ')
-    log(results)
     businesses = []
     for bus in results.businesses:
-        if bus.image_url == 'h':
+        log(bus.image_url)
+        log(bus.image_url)
+        if len(bus.image_url) < 6 or (bus.image_url[-4:] != '.jpg' or bus.image_url[-4:] != '.png' or bus.image_url[-5:] != '.jpeg'):
             bus_img_url = 'http://salonniere.herokuapp.com/static/img/salonniere_logo.png'
         else:
             bus_img_url = bus.image_url
