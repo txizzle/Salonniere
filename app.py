@@ -117,7 +117,7 @@ def getEventDetails(request):
     log(entities)
     
     # Check if event_token corresponds to a real event with event_code
-    if db.session.query(Event).filter(Event.token== event_token.lower()).count()
+    if db.session.query(Event).filter(Event.token== event_token.lower()).count():
         event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
         # context['event-owner'] = event.owner_id
         context['event-owner'] = 'TEST REPLACE THIS'
