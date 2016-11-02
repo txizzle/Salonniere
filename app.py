@@ -118,7 +118,7 @@ def setEventInvites(request):
     db.session.commit()
 
     for guest_email in event_invites:
-        event = db.session.query(Event).get(event_id)
+        event = db.session.query(Event).filter(Event.owner_id == owner_id).first()
         # month, day = parse_datetime(event.start_time)
         month, day = 'N O V', '5' # TODO: HARDCODED IN DATE. ADD TO WIT AI
         send_email('You\'re Invited!',
