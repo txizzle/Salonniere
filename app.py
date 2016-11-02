@@ -199,7 +199,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Postback",
-                    "payload": business[0][4],
+                    "payload": businesses[0][4],
                 }],
             }]
         }
@@ -607,7 +607,26 @@ def webhook():
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     payload = messaging_event["postback"]["payload"]
-                    send_message(sender_id, 'Payload received: ' + str(payload))
+
+                    # send_message(sender_id, 'Payload received: ' + str(payload))
+                    log('Payload: ')
+                    log(payload)
+
+
+                    current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
+                    old_context = ast.literal_eval(current_user.context)
+
+                    log('Old Context: ')
+                    log(old_context)
+
+                    new_context = wit_client.run_actions(sender_id, payload, old_context)
+
+                    # Save context
+                    current_user.context = str(new_context)
+                    db.session.commit()  
+
+                    log('New Context: ')
+                    log(new_context)
 
     return "ok", 200
 
