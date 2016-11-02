@@ -156,24 +156,24 @@ def findYelpSuggestions(request):
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[0][3],
-                    "title": "web url"
+                    "title": "Website"
                 }, {
                     "type": "postback",
-                    "title": "Postback",
-                    "payload": businesses[0][4],
+                    "title": "Choose it!",
+                    "payload": businesses[0][4][0],
                 }],
             }, {
                 "title": businesses[1][0],
                 "subtitle": businesses[1][1],
-                "image_url": businesses[1][2],
+                "image_url": businesses[1][2][0],
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[1][3],
-                    "title": "web url"
+                    "title": "Website"
                 }, {
                     "type": "postback",
-                    "title": "Postback",
-                    "payload": businesses[0][4],
+                    "title": "Choose it!",
+                    "payload": businesses[0][4][0],
                 }],
             }, {
                 "title": businesses[2][0],
@@ -182,11 +182,11 @@ def findYelpSuggestions(request):
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[2][3],
-                    "title": "web url"
+                    "title": "Website"
                 }, {
                     "type": "postback",
-                    "title": "Postback",
-                    "payload": businesses[0][4],
+                    "title": "Choose it!",
+                    "payload": businesses[0][4][0],
                 }],
             }, {
                 "title": businesses[3][0],
@@ -195,10 +195,10 @@ def findYelpSuggestions(request):
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[3][3],
-                    "title": "web url"
+                    "title": "Website"
                 }, {
                     "type": "postback",
-                    "title": "Postback",
+                    "title": "Choose it!",
                     "payload": businesses[0][4],
                 }],
             }]
