@@ -149,6 +149,11 @@ def getEventDetails(request):
         context['event-food'] = event.food
         context['event-token'] = event_token
         context['valid'] = True
+
+        # Hardcoding RSVP Update 
+        guest = db.session.query(User).filter(User.fb_id == context['fb_id']).first()
+        guest_name = guest.first_name + ' ' + guest.last_name
+        send_message(owner.fb_id, guest_name + ' just RSVP\'d to your event! Yay!')
     return context
 
 # Returns an answer to a nonessential question. This looks through all questions that
