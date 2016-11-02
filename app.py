@@ -62,7 +62,7 @@ def send(request, response):
 def setEventType(request):
     context = request['context']
     entities = request['entities']
-    event_type = _get_entity_value(entities, 'intent')
+    event_type = _get_entity_value(entities, 'event_type')
     if event_type == 'party':
         context['party'] = True
         # set this for when we create the event
