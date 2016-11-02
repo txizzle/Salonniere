@@ -130,7 +130,7 @@ def findYelpSuggestions(request):
     entities = request['entities']
     search_location = _get_entity_value(entities, 'location')
     search_params = {
-        'term': 'party',
+        'term': 'attractions',
         'limit': 4,
         'lang': 'en'
     }
@@ -145,7 +145,37 @@ def findYelpSuggestions(request):
 
     log('businesses')
     log(businesses)
-    send_message(context['fb_id'], str(businesses))
+    card_content = {
+        "type": "template",
+        "payload": {
+            "template_type": "generic",
+            "elements": [{
+                "title": businesses[0][0],
+                "subtitle": "Element #1 of an hscroll",
+                "image_url": businesess[0][1],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[0][2],
+                    "title": "web url"
+                }, {
+                    "type": "web_url",
+                    "url": "https://www.google.com",
+                    "title": "Google"
+                }],
+            }, {
+                "title": "Second Suggestion",
+                "subtitle": "Element #2 of an hscroll",
+                "image_url": businesess[1][1],
+                "buttons": [{
+                    "type": "postback",
+                    "title": "Postback",
+                    "payload": "Payload for second element in a generic bubble",
+                }],
+            }]
+        }
+    }
+    
+    send_card(context['fb_id'], card_content)
     return context
 
 def setEventFood(request):
@@ -572,6 +602,27 @@ def send_message(recipient_id, message_text):
         log(r.status_code)
         log(r.text)
 
+def send_card(recipient, card_content):
+    log("sending card to {recipient}: {text}".format(recipient=recipient_id, text=str(card_content)))
+
+    params = {
+        "access_token": os.environ["PAGE_ACCESS_TOKEN"]
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "message": {
+            "attachment": card_content
+        }
+    })
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
+    if r.status_code != 200:
+        log(r.status_code)
+        log(r.text)
 
 def log(message):  # simple wrapper for logging to stdout on heroku
     print(str(message))
