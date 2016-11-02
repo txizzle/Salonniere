@@ -13,3 +13,6 @@ simplejson==3.10.0
 Flask-Mail==0.9.1 
 blinker==1.4
 wit==4.1.0
+httplib2==0.9.2 
+oauth2==1.9.0.post1 
+yelp==1.0.2

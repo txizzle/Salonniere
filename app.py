@@ -12,6 +12,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from flask_mail import Mail, Message
 
+from yelp.client import Client
+from yelp.oauth1_authenticator import Oauth1Authenticator
+
 from util import sim
 
 SIM_THRESHOLD = .994
@@ -35,7 +38,17 @@ db = SQLAlchemy(app)
 #if len(sys.argv) != 2:
 #    print('usage: python ' + sys.argv[0] + ' <wit-token>')
 #    exit(1)
+
+# Wit.ai Access Token
 access_token = "GCBTBJWTLXQBY6AFODUPLEBANMDTWMZ7"
+
+# Yelp Authentication
+yelp_auth = Oauth1Authenticator(
+    consumer_key="sTz2nCsFD2dAJ1_7c0ytfA",
+    consumer_secret="9Pn2sMPZgaT2W37WmSy1YPpyozk",
+    token="mJXBXI9VdcQcVES9klEjtF2lUfs3vER2",
+    token_secret="c4jubvET7GkKN6lZkF70hnNaN4Y"
+)
 
 # convenience function
 def _get_entity_value(entities, entity):
@@ -102,7 +115,10 @@ def setEventLocation(request):
     context = request['context']
     entities = request['entities']
     event_location = _get_entity_value(entities, 'location')
-    if event_location:
+    if _get_entity_value(entities, 'recommendations'): 
+        # Return Yelp recommendations
+
+    elif event_location:
         context['known-location'] = True
         # set internal event location for later use
         context['eventLocation'] = event_location
@@ -110,6 +126,29 @@ def setEventLocation(request):
         context['unknown-location'] = True
         if context.get('known-location'):
             del context['known-location']
+    return context
+
+def findYelpSuggestions(request):
+    context = request['context']
+    entities = request['entities']
+    search_location = _get_entity_value(entities, 'location')
+    search_params = {
+        'term': 'party',
+        'limit': 4,
+        'lang': 'en'
+    }
+
+    yelp_client = Client(yelp_auth)
+    results = yelp_client.search(search_location, **search_params)
+    log('Yelp Results: ')
+    log(results)
+    businesses = []
+    for bus in results.businesses:
+        businesses.append([bus.name, bus.image_url, bus.url, bus.location.address])
+
+    log('businesses')
+    log(businesses)
+    send_message(context['fb_id'], str(businesses))
     return context
 
 def setEventFood(request):
@@ -245,14 +284,15 @@ actions = {
     'setEventName': setEventName,
     'setEventTime': setEventTime,
     'setEventLocation': setEventLocation,
+    'findYelpSuggestions': findYelpSuggestions,
     'setEventFood': setEventFood,
     'setEventInvites': setEventInvites,
     'getEventDetails': getEventDetails,
 	'answerOtherQuestion': answerOtherQuestion
 }
 
-client = Wit(access_token=access_token, actions=actions)
-# client.interactive() # comment this line to turn off interactive mode
+wit_client = Wit(access_token=access_token, actions=actions)
+# wit_client.interactive() # comment this line to turn off interactive mode
 
 # Create our database model
 # User model
@@ -491,7 +531,7 @@ def webhook():
                             new_context = str({"fb_id": sender_id})
                             send_message(sender_id, 'Resetting context for testing')
                         else:
-                            new_context = client.run_actions(sender_id, message_text, old_context)
+                            new_context = wit_client.run_actions(sender_id, message_text, old_context)
 
                         # Save context
                         current_user.context = str(new_context)
