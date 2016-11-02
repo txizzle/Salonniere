@@ -602,7 +602,7 @@ def send_message(recipient_id, message_text):
         log(r.status_code)
         log(r.text)
 
-def send_card(recipient, card_content):
+def send_card(recipient_id, card_content):
     log("sending card to {recipient}: {text}".format(recipient=recipient_id, text=str(card_content)))
 
     params = {
