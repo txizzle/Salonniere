@@ -73,6 +73,29 @@ def setEventType(request):
             del context['party']
     return context
 
+def setEventTime(request):
+    context = request['context']
+    entities = request['entities']
+    start_time = _get_entity_value(entities, 'datetime')
+    log('start_time')
+    log(start_time)
+    if start_time:
+        # set this for when we create the event
+        context['valid_start'] = True
+        context['eventStart'] = start_time
+    else:
+        context['invalid_start'] = True
+        if context.get('valid_start') is not None:
+            del context['valid_start']
+    return context
+
+def setEventName(request):
+    context = request['context']
+    entities = request['entities']
+    event_name = _get_entity_value(entities, 'event_name')
+    context['eventName'] = event_name
+    return context
+
 def setEventLocation(request):
     context = request['context']
     entities = request['entities']
@@ -138,10 +161,10 @@ def setEventInvites(request):
     print(event_invites)
 
     # Get Event fields from context
-    owner_fb_id, name, location, food = context['fb_id'], 'Party', context['eventLocation'], context['eventFood']
+    owner_fb_id, name, start_time, location, food = context['fb_id'], context['eventName'], context['eventStart'], context['eventLocation'], context['eventFood']
 
     # Add Event to database
-    reg = Event(owner_fb_id, name, location=location, food=food)
+    reg = Event(owner_fb_id, name, location=location, food=food, start_time=start_time)
     db.session.add(reg)
     db.session.commit()
 
@@ -167,6 +190,8 @@ def setEventInvites(request):
 actions = {
     'send': send,
     'setEventType': setEventType,
+    'setEventName': setEventName,
+    'setEventTime': setEventTime,
     'setEventLocation': setEventLocation,
     'setEventFood': setEventFood,
     'setEventInvites': setEventInvites,
