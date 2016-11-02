@@ -364,7 +364,7 @@ def webhook():
                                 "access_token": os.environ["PAGE_ACCESS_TOKEN"]
                             }
 
-                            r = requests.post("https://graph.facebook.com/v2.8/" + sender_id, params=params))
+                            r = requests.post("https://graph.facebook.com/v2.8/" + sender_id, params=params)
                             response = ast.literal_eval(r.text)
 
                             first_name, last_name = response['first_name'], response['last_name']
