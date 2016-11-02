@@ -225,8 +225,8 @@ def setEventInvites(request):
     for guest_email in event_invites:
         owner = db.session.query(User).get(owner_id)
         event = db.session.query(Event).filter(Event.owner_id == owner_id).first()
-        # month, day = parse_datetime(event.start_time)
-        month, day = 'N O V', '5' # TODO: HARDCODED IN DATE. ADD TO WIT AI
+        month, day = parse_datetime(event.start_time)
+        # month, day = 'N O V', '5' # TODO: HARDCODED IN DATE. ADD TO WIT AI
         send_email('You\'re Invited!',
                     'salonniere.ai@gmail.com',
                     guest_email,
@@ -479,6 +479,10 @@ def webhook():
 
                         # Hardcoding 'reset' for testing purposes
                         if message_text.lower() == 'reset':
+                            # Delete all events I own
+                            sender_uid = current_user.id
+                            db.session.delete(db.session.query(Event).filter(Event.owner_id == sender_uid))
+                            db.session.commit()
                             new_context = str({"fb_id": sender_id})
                             send_message(sender_id, 'Resetting context for testing')
                         else:
