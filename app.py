@@ -367,7 +367,7 @@ def webhook():
                             r = requests.post("https://graph.facebook.com/v2.8/" + sender_id, params=params)
                             response = ast.literal_eval(r.text)
                             log('Response: ')
-                            log(reponse)
+                            log(response)
 
                             first_name, last_name = response['first_name'], response['last_name']
                             initial_context = str({"fb_id": sender_id})
