@@ -160,7 +160,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Postback",
-                    "payload": business[0][4],
+                    "payload": businesses[0][4],
                 }],
             }, {
                 "title": businesses[1][0],
@@ -173,7 +173,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Postback",
-                    "payload": business[0][4],
+                    "payload": businesses[0][4],
                 }],
             }, {
                 "title": businesses[2][0],
@@ -186,7 +186,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Postback",
-                    "payload": business[0][4],
+                    "payload": businesses[0][4],
                 }],
             }, {
                 "title": businesses[3][0],
