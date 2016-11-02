@@ -12,6 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from flask_mail import Mail, Message
 
+import util
+
 app = Flask(__name__)
 
 # Setup Flask-Mail
