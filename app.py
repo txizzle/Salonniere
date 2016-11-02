@@ -103,7 +103,7 @@ def getEventDetails(request):
     log('event_token: ')
     log(event_token)
     # Find event in Postgres with event_code
-    event = db.session.query(Event).filter(Event.token.lower() == event_token.lower()).first()
+    event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
     # context['event-owner'] = event.owner_id
     context['event-owner'] = 'TEST REPLACE THIS'
     context['event-location'] = event.location
