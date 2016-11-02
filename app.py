@@ -93,6 +93,18 @@ def setEventFood(request):
     context['eventFood'] = event_food
     return context
 
+def getEventDetail(request):
+    context = request['context']
+    entities = request['entities']
+    event_token = _get_entity_value(entities, 'intent')
+
+    # Find event in Postgres with event_code
+    event = db.session.query(Event).filter(Event.token == event_token).first()
+    context['event-owner'] = event.owner_fb_id
+    context['event-location'] = event.location
+    context['event-food'] = event.food
+    return context
+
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
