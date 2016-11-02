@@ -139,13 +139,7 @@ def findYelpSuggestions(request):
     results = yelp_client.search(search_location, **search_params)
     businesses = []
     for bus in results.businesses:
-        log(bus.image_url)
-        log(bus.image_url)
-        if len(bus.image_url) < 6 or (bus.image_url[-4:] != '.jpg' or bus.image_url[-4:] != '.png' or bus.image_url[-5:] != '.jpeg'):
-            bus_img_url = 'http://salonniere.herokuapp.com/static/img/salonniere_logo.png'
-        else:
-            bus_img_url = bus.image_url
-        businesses.append([bus.name, bus.snippet_text, bus_img_url, bus.url, bus.location.address])
+        businesses.append([bus.name, bus.snippet_text, bus.img_url, bus.url, bus.location.address])
 
     log('businesses')
     log(businesses)
@@ -169,7 +163,7 @@ def findYelpSuggestions(request):
             }, {
                 "title": businesses[1][0],
                 "subtitle": businesses[1][1],
-                "image_url": businesses[1][2][0],
+                "image_url": businesses[1][2],
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[1][3],
@@ -177,7 +171,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Choose it!",
-                    "payload": businesses[0][4][0],
+                    "payload": businesses[1][4][0],
                 }],
             }, {
                 "title": businesses[2][0],
@@ -190,7 +184,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Choose it!",
-                    "payload": businesses[0][4][0],
+                    "payload": businesses[2][4][0],
                 }],
             }, {
                 "title": businesses[3][0],
@@ -203,7 +197,7 @@ def findYelpSuggestions(request):
                 }, {
                     "type": "postback",
                     "title": "Choose it!",
-                    "payload": businesses[0][4],
+                    "payload": businesses[3][4][0],
                 }],
             }]
         }
