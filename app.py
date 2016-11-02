@@ -126,9 +126,7 @@ def getEventDetails(request):
     # event_token = _get_entity_value(entities, 'intent')
     animals = _get_entity_values(entities, 'animal')
     number = _get_entity_value(entities, 'number')
-    log('animals: ')
-    log(animals)
-    log(number)
+    log('animal1: {0}, animal2: {1}, number: {2}'.format(animals[0], animals[1], number))
 
     event_token = ''
     if animals and len(animals) == 2 and number:
@@ -193,10 +191,10 @@ def askQuestionToHost(owner_id, question):
     user = db.session.query(User).get(owner_id)
     fb_id = user.fb_id
     context = ast.literal_eval(user.context)
-	
+
     # Return with context of question
     context['cur_question'] = question
-    return context
+    send_message(fb_id, question)
 
 def setEventInvites(request):
     context = request['context']
