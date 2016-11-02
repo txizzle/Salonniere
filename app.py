@@ -141,7 +141,7 @@ def findYelpSuggestions(request):
     log(results)
     businesses = []
     for bus in results.businesses:
-        if bus.image_url == '':
+        if bus.image_url == 'h':
             bus_img_url = 'http://salonniere.herokuapp.com/static/img/salonniere_logo.png'
         else:
             bus_img_url = bus.image_url
