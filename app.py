@@ -90,7 +90,7 @@ def setEventLocation(request):
 def setEventFood(request):
     context = request['context']
     entities = request['entities']
-    event_food = _get_entity_value(entities, 'intent')
+    event_food = _get_entity_value(entities, 'food')
     # set internal event food for later use
     context['eventFood'] = event_food
     return context
