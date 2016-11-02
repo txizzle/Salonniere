@@ -112,6 +112,8 @@ def setEventInvites(request):
     db.session.commit()
 
     # Add invite token to event
+    owner_id = User.query.filter(User.fb_id.match(owner_fb_id))[0].id
+    new_event = db.session.query(Event).filter(Event.owner_id == owner_id).first()
     new_event.token = generate_token(new_event.id)
     db.session.commit()
 
