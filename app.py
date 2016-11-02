@@ -130,7 +130,7 @@ def getEventDetails(request):
 
     event_token = ''
     if animals and len(animals) == 2 and number:
-        event_token = animals[0] + ' ' + animals[1] + ' ' + str(number)
+        event_token = str(number) + ' ' + animals[0] + ' ' + animals[1]
 
     log('Event token')
     log(event_token)
