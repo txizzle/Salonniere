@@ -126,7 +126,7 @@ def getEventDetails(request):
     # event_token = _get_entity_value(entities, 'intent')
     animals = _get_entity_values(entities, 'animal')
     number = _get_entity_value(entities, 'number')
-	log('animal1: {0}, animal2: {1}, number: {2}'.format(animals[0], animals[1], number))
+    log('animal1: {0}, animal2: {1}, number: {2}'.format(animals[0], animals[1], number))
 
     event_token = ''
     if animals and len(animals) == 2 and number:
