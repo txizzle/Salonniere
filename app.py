@@ -64,7 +64,7 @@ def send(request, response):
 def setEventType(request):
     context = request['context']
     entities = request['entities']
-    event_type = _get_entity_value(entities, 'intent')
+    event_type = _get_entity_value(entities, 'event_type')
     if event_type == 'party':
         context['party'] = True
         # set this for when we create the event
@@ -92,7 +92,7 @@ def setEventLocation(request):
 def setEventFood(request):
     context = request['context']
     entities = request['entities']
-    event_food = _get_entity_value(entities, 'intent')
+    event_food = _get_entity_value(entities, 'food')
     # set internal event food for later use
     context['eventFood'] = event_food
     return context
@@ -100,20 +100,33 @@ def setEventFood(request):
 def getEventDetails(request):
     context = request['context']
     entities = request['entities']
-    event_token = _get_entity_value(entities, 'intent')
+    # event_token = _get_entity_value(entities, 'intent')
+    animals = _get_entity_values(entities, 'animal')
+    number = _get_entity_value(entities, 'number')
+    log('animals: ')
+    log(animals)
+    log(number)
 
+    event_token = ''
+    if animals and len(animals) == 2 and number:
+        event_token = animals[0] + ' ' + animals[1] + ' ' + str(number)
+
+    log('Event token')
+    log(event_token)
     log('Context in getEventDetails')
     log(context)
     log('Entities in getEventDetails')
     log(entities)
-    log('event_token: ')
-    log(event_token)
-    # Find event in Postgres with event_code
-    event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
-    # context['event-owner'] = event.owner_id
-    context['event-owner'] = 'TEST REPLACE THIS'
-    context['event-location'] = event.location
-    context['event-food'] = event.food
+    
+    # Check if event_token corresponds to a real event with event_code
+    if db.session.query(Event).filter(Event.token== event_token.lower()).count():
+        event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
+        # context['event-owner'] = event.owner_id
+        context['event-owner'] = 'TEST REPLACE THIS'
+        context['event-location'] = event.location
+        context['event-food'] = event.food
+        context['event-token'] = event_token
+        context['valid'] = 'True'
     return context
 
 # Returns an answer to a nonessential question. This looks through all questions that
