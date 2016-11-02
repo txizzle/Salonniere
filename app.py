@@ -115,10 +115,7 @@ def setEventLocation(request):
     context = request['context']
     entities = request['entities']
     event_location = _get_entity_value(entities, 'location')
-    if _get_entity_value(entities, 'recommendations'): 
-        # Return Yelp recommendations
-
-    elif event_location:
+    if event_location:
         context['known-location'] = True
         # set internal event location for later use
         context['eventLocation'] = event_location
