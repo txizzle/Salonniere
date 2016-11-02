@@ -139,7 +139,7 @@ def findYelpSuggestions(request):
     results = yelp_client.search(search_location, **search_params)
     businesses = []
     for bus in results.businesses:
-        businesses.append([bus.name, bus.snippet_text, bus.img_url, bus.url, bus.location.address])
+        businesses.append([bus.name, bus.snippet_text, bus.image_url, bus.url, bus.location.address])
 
     log('businesses')
     log(businesses)
