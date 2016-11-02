@@ -130,7 +130,7 @@ def getEventDetails(request):
 
     event_token = ''
     if animals and len(animals) == 2 and number:
-        event_token = str(number) + ' ' + animals[0] + ' ' + animals[1]
+        event_token = animals[0] + ' '+ str(number) + ' ' + animals[1]
 
     log('Event token')
     log(event_token)
@@ -376,10 +376,7 @@ def events_prereg():
 def generate_token(id):
     animals = ['albatross', 'beaver', 'cougar', 'elephant', 'fox', 'hyena', 'lion', 'lynx', 'penguin', 'ram', 'wolf', 'zebra']
     token = ''
-    token += str(13*id % 29)
-    for _ in range(2):
-        token += ' '
-        token += animals[randint(0,len(animals)-1)]
+    token = animals[randint(0,len(animals)-1)] + ' ' + str(13*id % 29) + ' ' + animals[randint(0,len(animals)-1)]
     return token
 
 @app.route('/email')
