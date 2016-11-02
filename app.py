@@ -95,7 +95,7 @@ def setEventFood(request):
     context['eventFood'] = event_food
     return context
 
-def getEventDetail(request):
+def getEventDetails(request):
     context = request['context']
     entities = request['entities']
     event_token = _get_entity_value(entities, 'intent')
@@ -149,7 +149,8 @@ actions = {
     'setEventType': setEventType,
     'setEventLocation': setEventLocation,
     'setEventFood': setEventFood,
-    'setEventInvites': setEventInvites
+    'setEventInvites': setEventInvites,
+    'getEventDetails': getEventDetails
 }
 
 client = Wit(access_token=access_token, actions=actions)
