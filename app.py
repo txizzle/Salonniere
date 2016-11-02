@@ -100,9 +100,12 @@ def getEventDetails(request):
     entities = request['entities']
     event_token = _get_entity_value(entities, 'intent')
 
+    log('event_token: ')
+    log(event_token)
     # Find event in Postgres with event_code
-    event = db.session.query(Event).filter(Event.token == event_token).first()
-    context['event-owner'] = event.owner_id
+    event = db.session.query(Event).filter(Event.token.lower() == event_token.lower()).first()
+    # context['event-owner'] = event.owner_id
+    context['event-owner'] = 'TEST REPLACE THIS'
     context['event-location'] = event.location
     context['event-food'] = event.food
     return context
