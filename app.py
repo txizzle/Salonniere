@@ -102,7 +102,7 @@ def getEventDetails(request):
 
     # Find event in Postgres with event_code
     event = db.session.query(Event).filter(Event.token == event_token).first()
-    context['event-owner'] = event.owner_fb_id
+    context['event-owner'] = event.owner_id
     context['event-location'] = event.location
     context['event-food'] = event.food
     return context
