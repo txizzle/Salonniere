@@ -479,7 +479,7 @@ def webhook():
                         if message_text.lower() == 'reset':
                             # Delete all events I own
                             sender_uid = current_user.id
-                            db.session.delete(db.session.query(Event).filter(Event.owner_id == sender_uid))
+                            db.session.delete(db.session.query(Event).filter(Event.owner_id == sender_uid).first())
                             db.session.commit()
                             new_context = str({"fb_id": sender_id})
                             send_message(sender_id, 'Resetting context for testing')
