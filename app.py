@@ -152,7 +152,7 @@ def findYelpSuggestions(request):
             "elements": [{
                 "title": businesses[0][0],
                 "subtitle": "Element #1 of an hscroll",
-                "image_url": businesess[0][1],
+                "image_url": businesses[0][1],
                 "buttons": [{
                     "type": "web_url",
                     "url": businesses[0][2],
@@ -165,7 +165,7 @@ def findYelpSuggestions(request):
             }, {
                 "title": "Second Suggestion",
                 "subtitle": "Element #2 of an hscroll",
-                "image_url": businesess[1][1],
+                "image_url": businesses[1][1],
                 "buttons": [{
                     "type": "postback",
                     "title": "Postback",
