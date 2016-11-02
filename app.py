@@ -12,7 +12,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
 from flask_mail import Mail, Message
 
-import util
+from util import sim
+
+SIM_THRESHOLD = .994
 
 app = Flask(__name__)
 
@@ -114,6 +116,52 @@ def getEventDetails(request):
     context['event-food'] = event.food
     return context
 
+# Returns an answer to a nonessential question. This looks through all questions that
+# were asked so far and compares the similarity between the current question and all
+# other questions. If a match is found and the answer is known, it updates the context
+# with the answer. If not, context['answer'] will be None, and askQuestionToHost will be
+# called.
+def answerOtherQuestion(request):
+    context = request['context']
+    entities = request['entities']
+
+    question = _get_entity_values(entities, 'question')
+    event_token = _get_entity_values(entities, 'event-token')
+    event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
+    owner_id = context['owner_id']
+
+    # If not a single question was not asked before
+    if not event.other:
+        event.other = str({ question:None })
+        context['answer'] = None
+#        askQuestionToHost(owner_id, question);
+        return context
+    other = dict(event.other)
+
+    # Check if question is close to any asked question
+    for other_question in other:
+        if sim(question, other_question) > SIM_THRESHOLD:    # If question matches
+            context['answer'] = other[other_question]
+#            if context['answer'] == None:
+#                askQuestionToHost(owner_id, other_question)
+            return context
+    
+    # If question is not close to any asked question
+    other[question] = None
+    context['answer'] = None
+#	askQuestionToHost(owner_id, question)
+    return context
+
+def askQuestionToHost(owner_id, question):
+    # Get fb_id of host
+    user = db.session.query(User).get(owner_id)
+    fb_id = user.fb_id
+    context = ast.literal_eval(user.context)
+	
+    # Return with context of question
+    context['cur_question'] = question
+    return context
+
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
@@ -157,7 +205,8 @@ actions = {
     'setEventLocation': setEventLocation,
     'setEventFood': setEventFood,
     'setEventInvites': setEventInvites,
-    'getEventDetails': getEventDetails
+    'getEventDetails': getEventDetails,
+	'answerOtherQuestion': answerOtherQuestion
 }
 
 client = Wit(access_token=access_token, actions=actions)
