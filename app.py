@@ -100,6 +100,10 @@ def getEventDetails(request):
     entities = request['entities']
     event_token = _get_entity_value(entities, 'intent')
 
+    log('Context in getEventDetails')
+    log(context)
+    log('Entities in getEventDetails')
+    log(entities)
     log('event_token: ')
     log(event_token)
     # Find event in Postgres with event_code
