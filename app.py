@@ -101,6 +101,10 @@ def getEventDetails(request):
     # event_token = _get_entity_value(entities, 'intent')
     animals = _get_entity_values(entities, 'animal')
     number = _get_entity_value(entities, 'number')
+    log('animals: ')
+    log(animals)
+    log(number)
+    
     event_token = ''
     if animals and number:
         event_token = animals[0] + ' ' + animals[1] + ' ' + number
@@ -109,9 +113,7 @@ def getEventDetails(request):
     log(context)
     log('Entities in getEventDetails')
     log(entities)
-    log('animals: ')
-    log(animals)
-    log(number)
+    
     # Find event in Postgres with event_code
     event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
     # context['event-owner'] = event.owner_id
