@@ -334,32 +334,36 @@ def webhook():
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-                    message_text = messaging_event["message"]["text"]  # the message's text
-
-                    # If the User doesn't exist, add them to the database. Else, find User from database.
-                    if db.session.query(User).filter(User.fb_id == sender_id).count() == 0:
-                        initial_context = str({"fb_id": sender_id})
-                        db.session.add(User(sender_id, context=initial_context))
-                        db.session.commit()    
-                    current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
-                    old_context = ast.literal_eval(current_user.context)
-
-                    log('Old Context: ')
-                    log(old_context)
-
-                    # Hardcoding 'reset' for testing purposes
-                    if message_text.lower() == 'reset':
-                        new_context = str({"fb_id": sender_id})
-                        send_message(sender_id, 'Resetting context for testing')
+                    
+                    if "text" not in message_event["message"]:
+                        send_message(sender_id, 'Sorry, I only understand words!')
                     else:
-                        new_context = client.run_actions(sender_id, message_text, old_context)
+                        message_text = messaging_event["message"]["text"]  # the message's text
 
-                    # Save context
-                    current_user.context = str(new_context)
-                    db.session.commit()  
+                        # If the User doesn't exist, add them to the database. Else, find User from database.
+                        if db.session.query(User).filter(User.fb_id == sender_id).count() == 0:
+                            initial_context = str({"fb_id": sender_id})
+                            db.session.add(User(sender_id, context=initial_context))
+                            db.session.commit()    
+                        current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
+                        old_context = ast.literal_eval(current_user.context)
 
-                    log('New Context: ')
-                    log(new_context)
+                        log('Old Context: ')
+                        log(old_context)
+
+                        # Hardcoding 'reset' for testing purposes
+                        if message_text.lower() == 'reset':
+                            new_context = str({"fb_id": sender_id})
+                            send_message(sender_id, 'Resetting context for testing')
+                        else:
+                            new_context = client.run_actions(sender_id, message_text, old_context)
+
+                        # Save context
+                        current_user.context = str(new_context)
+                        db.session.commit()  
+
+                        log('New Context: ')
+                        log(new_context)
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
