@@ -680,6 +680,10 @@ def log(message):  # simple wrapper for logging to stdout on heroku
     print(str(message))
     sys.stdout.flush()
 
+# Privacy policy
+@app.route('/privacy')
+def signup_index():
+    return render_template('privacypolicy.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
