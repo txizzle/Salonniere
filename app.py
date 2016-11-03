@@ -118,6 +118,8 @@ def setEventLocation(request):
     if event_location:
         context['known-location'] = True
         # set internal event location for later use
+        if context.get('unknown-location'):
+            del context['unknown-location']
         context['eventLocation'] = event_location
     else:
         context['unknown-location'] = True
