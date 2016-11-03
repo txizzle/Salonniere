@@ -40,14 +40,14 @@ db = SQLAlchemy(app)
 #    exit(1)
 
 # Wit.ai Access Token
-access_token = "GCBTBJWTLXQBY6AFODUPLEBANMDTWMZ7"
+access_token = os.environ['WIT_TOKEN']
 
 # Yelp Authentication
 yelp_auth = Oauth1Authenticator(
-    consumer_key="sTz2nCsFD2dAJ1_7c0ytfA",
-    consumer_secret="9Pn2sMPZgaT2W37WmSy1YPpyozk",
-    token="mJXBXI9VdcQcVES9klEjtF2lUfs3vER2",
-    token_secret="c4jubvET7GkKN6lZkF70hnNaN4Y"
+    consumer_key=os.environ['YELP_CONSUMER_KEY'],
+    consumer_secret=os.environ['YELP_CONSUMER_SECRET'],
+    token=os.environ['YELP_TOKEN'],
+    token_secret=os.environ['YELP_TOKEN_SECRET']
 )
 
 # convenience function
