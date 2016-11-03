@@ -231,6 +231,8 @@ def answerOtherQuestion(request):
     context = request['context']
     entities = request['entities']
 
+    log("Other - Context: {0}.\n Other - Entities: {1}".format(context, entities))
+
     question = _get_entity_values(entities, 'question')
     event_token = _get_entity_values(entities, 'event-token')
     event = db.session.query(Event).filter(Event.token == event_token.lower()).first()
@@ -241,6 +243,7 @@ def answerOtherQuestion(request):
         event.other = str({ question:None })
         context['answer'] = None
 #        askQuestionToHost(owner_id, question);
+        log("New question - question: {0}".format(question))
         return context
     other = dict(event.other)
 
@@ -250,11 +253,13 @@ def answerOtherQuestion(request):
             context['answer'] = other[other_question]
 #            if context['answer'] == None:
 #                askQuestionToHost(owner_id, other_question)
+            log("Similar question - {0} = {1}".format(question, other_question))
             return context
     
     # If question is not close to any asked question
     other[question] = None
     context['answer'] = None
+    log("Not similar question - {0}".format(question))
 #	askQuestionToHost(owner_id, question)
     return context
 
@@ -267,6 +272,8 @@ def askQuestionToHost(owner_id, question):
     # Return with context of question
     context['cur_question'] = question
     send_message(fb_id, question)
+    
+    
 
 def setEventInvites(request):
     context = request['context']
