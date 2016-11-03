@@ -682,7 +682,7 @@ def log(message):  # simple wrapper for logging to stdout on heroku
 
 # Privacy policy
 @app.route('/privacy')
-def signup_index():
+def privacy():
     return render_template('privacypolicy.html')
 
 if __name__ == '__main__':
