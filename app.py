@@ -118,6 +118,8 @@ def setEventLocation(request):
     if event_location:
         context['known-location'] = True
         # set internal event location for later use
+        if context.get('unknown-location'):
+            del context['unknown-location']
         context['eventLocation'] = event_location
     else:
         context['unknown-location'] = True
@@ -137,11 +139,11 @@ def findYelpSuggestions(request):
 
     yelp_client = Client(yelp_auth)
     results = yelp_client.search(search_location, **search_params)
-    log('Yelp Results: ')
-    log(results)
     businesses = []
     for bus in results.businesses:
-        businesses.append([bus.name, bus.image_url, bus.url, bus.location.address])
+        bus_img_url = bus.image_url
+        bus_img_highres = bus_img_url[:-6] + 'o' + bus_img_url[-4:]
+        businesses.append([bus.name, bus.snippet_text, bus_img_highres, bus.url, bus.location.address])
 
     log('businesses')
     log(businesses)
@@ -151,25 +153,55 @@ def findYelpSuggestions(request):
             "template_type": "generic",
             "elements": [{
                 "title": businesses[0][0],
-                "subtitle": "Element #1 of an hscroll",
-                "image_url": businesses[0][1],
+                "subtitle": businesses[0][1],
+                "image_url": businesses[0][2],
                 "buttons": [{
                     "type": "web_url",
-                    "url": businesses[0][2],
-                    "title": "web url"
+                    "url": businesses[0][3],
+                    "title": "Website"
                 }, {
-                    "type": "web_url",
-                    "url": "https://www.google.com",
-                    "title": "Google"
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[0][4][0],
                 }],
             }, {
-                "title": "Second Suggestion",
-                "subtitle": "Element #2 of an hscroll",
-                "image_url": businesses[1][1],
+                "title": businesses[1][0],
+                "subtitle": businesses[1][1],
+                "image_url": businesses[1][2],
                 "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[1][3],
+                    "title": "Website"
+                }, {
                     "type": "postback",
-                    "title": "Postback",
-                    "payload": "Payload for second element in a generic bubble",
+                    "title": "Choose it!",
+                    "payload": businesses[1][4][0],
+                }],
+            }, {
+                "title": businesses[2][0],
+                "subtitle": businesses[2][1],
+                "image_url": businesses[2][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[2][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[2][4][0],
+                }],
+            }, {
+                "title": businesses[3][0],
+                "subtitle": businesses[3][1],
+                "image_url": businesses[3][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[3][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[3][4][0],
                 }],
             }]
         }
@@ -581,7 +613,29 @@ def webhook():
                     pass
 
                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
-                    pass
+                    sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
+                    recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+                    payload = messaging_event["postback"]["payload"]
+
+                    # send_message(sender_id, 'Payload received: ' + str(payload))
+                    log('Payload: ')
+                    log(payload)
+
+
+                    current_user = db.session.query(User).filter(User.fb_id == sender_id).first()
+                    old_context = ast.literal_eval(current_user.context)
+
+                    log('Old Context: ')
+                    log(old_context)
+
+                    new_context = wit_client.run_actions(sender_id, payload, old_context)
+
+                    # Save context
+                    current_user.context = str(new_context)
+                    db.session.commit()  
+
+                    log('New Context: ')
+                    log(new_context)
 
     return "ok", 200
 
@@ -635,6 +689,10 @@ def log(message):  # simple wrapper for logging to stdout on heroku
     print(str(message))
     sys.stdout.flush()
 
+# Privacy policy
+@app.route('/privacy')
+def privacy():
+    return render_template('privacypolicy.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
