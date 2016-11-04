@@ -316,6 +316,8 @@ def setEventType(request):
         context['party'] = True
         # set this for when we create the event
         context['eventType'] = 'party'
+        if context.get('invalidEvent') is not None:
+            del context['invalidEvent']
     else:
         context['invalidEvent'] = True
         if context.get('party') is not None:
