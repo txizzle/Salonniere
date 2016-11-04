@@ -349,6 +349,9 @@ def setEventLocation(request):
     context = request['context']
     entities = request['entities']
     event_location = _get_entity_value(entities, 'location')
+    log('setEventLocation')
+    log(entities)
+    log(context)
     if event_location:
         context['known-location'] = True
         # set internal event location for later use
