@@ -369,6 +369,8 @@ def setEventLocation(request):
         context['unknown-location'] = True
         if context.get('known-location'):
             del context['known-location']
+    log('setEventLocation context')
+    log(context)
     return context
 
 def findYelpLocationSuggestions(request):
