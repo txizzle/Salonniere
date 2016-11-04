@@ -349,6 +349,7 @@ def setEventLocation(request):
     context = request['context']
     entities = request['entities']
     event_location = _get_entity_value(entities, 'location')
+    local_search_query = _get_entity_value(entities, 'local_search_query')
     log('setEventLocation')
     log(entities)
     log(context)
@@ -358,6 +359,12 @@ def setEventLocation(request):
         if context.get('unknown-location'):
             del context['unknown-location']
         context['eventLocation'] = event_location
+    elif local_search_query:
+        context['known-location'] = True
+        # set internal event location for later use
+        if context.get('unknown-location'):
+            del context['unknown-location']
+        context['eventLocation'] = local_search_query
     else:
         context['unknown-location'] = True
         if context.get('known-location'):
@@ -685,7 +692,7 @@ actions = {
     'setEventLocation': setEventLocation,
     'findYelpLocationSuggestions': findYelpLocationSuggestions,
     'setEventFood': setEventFood,
-    'findYelpFoodSuggestions': findYelpFoodSuggestions,
+    'findYelpFoodSuggestions': findYelpLocationSuggestions,
     'setEventInvites': setEventInvites,
     'getEventDetails': getEventDetails,
     'answerOtherQuestion': answerOtherQuestion
