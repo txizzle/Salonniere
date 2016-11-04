@@ -9,7 +9,7 @@
 #
 # Sally is an intelligent event planner on Facebook messenger. Facebook, Inc. approved
 # the software as of November 3, 2016. This software may NOT be used without the consent
-# and may NOT be used with warranty of MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# and may NOT be used without warranty of MERCHATABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 __version__ = '0.1'
