@@ -483,14 +483,14 @@ def findYelpFoodSuggestions(request):
     context = request['context']
     entities = request['entities']
     search_location = context['eventLocation']
-    search_params = {
+    search_food_params = {
         'term': 'food',
         'limit': 4,
         'lang': 'en'
     }
 
     yelp_client = Client(yelp_auth)
-    results = yelp_client.search(search_location, **search_params)
+    results = yelp_client.search(search_location, **search_food_params)
     businesses = []
     for bus in results.businesses:
         bus_img_url = bus.image_url
@@ -694,7 +694,7 @@ actions = {
     'setEventLocation': setEventLocation,
     'findYelpLocationSuggestions': findYelpLocationSuggestions,
     'setEventFood': setEventFood,
-    'findYelpFoodSuggestions': findYelpLocationSuggestions,
+    'findYelpFoodSuggestions': findYelpFoodSuggestions,
     'setEventInvites': setEventInvites,
     'getEventDetails': getEventDetails,
     'answerOtherQuestion': answerOtherQuestion
