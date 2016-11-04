@@ -360,7 +360,7 @@ def setEventLocation(request):
     #         del context['unknown-location']
     #     context['eventLocation'] = event_location
     # elif local_search_query:
-    if local_search_query
+    if local_search_query:
         context['known-location'] = True
         # set internal event location for later use
         if context.get('unknown-location'):
