@@ -451,12 +451,19 @@ def setEventFood(request):
     context = request['context']
     entities = request['entities']
     event_food = _get_entity_value(entities, 'food')
+    event_local_search = _get_entity_value(entities, 'local_search_query')
     if event_food:
         context['known-food'] = True
         if context.get('unknown-food'):
             del context['unknown-food']
         # set internal event food for later use
         context['eventFood'] = event_food
+    elif event_local_search:
+        context['known-food'] = True
+        if context.get('unknown-food'):
+            del context['unknown-food']
+        # set internal event food for later use
+        context['eventFood'] = event_local_search
     else:
         context['unknown-food'] = True
         if context.get('known-food'):
