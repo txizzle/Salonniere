@@ -364,7 +364,7 @@ def setEventLocation(request):
             del context['known-location']
     return context
 
-def findYelpSuggestions(request):
+def findYelpLocationSuggestions(request):
     context = request['context']
     entities = request['entities']
     search_location = _get_entity_value(entities, 'location')
@@ -461,6 +461,89 @@ def setEventFood(request):
         context['unknown-food'] = True
         if context.get('known-food'):
             del context['known-food']
+    return context
+
+def findYelpFoodSuggestions(request):
+    context = request['context']
+    entities = request['entities']
+    search_location = context['eventLocation']
+    search_params = {
+        'term': 'food',
+        'limit': 4,
+        'lang': 'en'
+    }
+
+    yelp_client = Client(yelp_auth)
+    results = yelp_client.search(search_location, **search_params)
+    businesses = []
+    for bus in results.businesses:
+        bus_img_url = bus.image_url
+        bus_img_highres = bus_img_url[:-6] + 'o' + bus_img_url[-4:]
+        businesses.append([bus.name, bus.snippet_text, bus_img_highres, bus.url])
+
+    log('businesses')
+    log(businesses)
+    card_content = {
+        "type": "template",
+        "payload": {
+            "template_type": "generic",
+            "elements": [{
+                "title": businesses[0][0],
+                "subtitle": businesses[0][1],
+                "image_url": businesses[0][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[0][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[0][0],
+                }],
+            }, {
+                "title": businesses[1][0],
+                "subtitle": businesses[1][1],
+                "image_url": businesses[1][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[1][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[1][0],
+                }],
+            }, {
+                "title": businesses[2][0],
+                "subtitle": businesses[2][1],
+                "image_url": businesses[2][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[2][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[2][0],
+                }],
+            }, {
+                "title": businesses[3][0],
+                "subtitle": businesses[3][1],
+                "image_url": businesses[3][2],
+                "buttons": [{
+                    "type": "web_url",
+                    "url": businesses[3][3],
+                    "title": "Website"
+                }, {
+                    "type": "postback",
+                    "title": "Choose it!",
+                    "payload": businesses[3][0],
+                }],
+            }]
+        }
+    }
+    
+    send_card(context['fb_id'], card_content)
     return context
 
 def getEventDetails(request):
@@ -593,8 +676,9 @@ actions = {
     'setEventName': setEventName,
     'setEventTime': setEventTime,
     'setEventLocation': setEventLocation,
-    'findYelpSuggestions': findYelpSuggestions,
+    'findYelpLocationSuggestions': findYelpLocationSuggestions,
     'setEventFood': setEventFood,
+    'findYelpFoodSuggestions': findYelpFoodSuggestions,
     'setEventInvites': setEventInvites,
     'getEventDetails': getEventDetails,
     'answerOtherQuestion': answerOtherQuestion
