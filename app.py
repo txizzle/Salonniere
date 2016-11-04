@@ -456,8 +456,16 @@ def setEventFood(request):
     context = request['context']
     entities = request['entities']
     event_food = _get_entity_value(entities, 'food')
-    # set internal event food for later use
-    context['eventFood'] = event_food
+    if event_food:
+        context['known-food'] = True
+        if context.get('unknown-food'):
+            del context['unknown-food']
+        # set internal event food for later use
+        context['eventFood'] = event_food
+    else:
+        context['unknown-food'] = True
+        if context.get('known-food'):
+            del context['known-food']
     return context
 
 def getEventDetails(request):
