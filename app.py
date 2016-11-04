@@ -348,18 +348,19 @@ def setEventName(request):
 def setEventLocation(request):
     context = request['context']
     entities = request['entities']
-    event_location = _get_entity_value(entities, 'location')
+    # event_location = _get_entity_value(entities, 'location')
     local_search_query = _get_entity_value(entities, 'local_search_query')
     log('setEventLocation')
     log(entities)
     log(context)
-    if event_location:
-        context['known-location'] = True
-        # set internal event location for later use
-        if context.get('unknown-location'):
-            del context['unknown-location']
-        context['eventLocation'] = event_location
-    elif local_search_query:
+    # if event_location:
+    #     context['known-location'] = True
+    #     # set internal event location for later use
+    #     if context.get('unknown-location'):
+    #         del context['unknown-location']
+    #     context['eventLocation'] = event_location
+    # elif local_search_query:
+    if local_search_query
         context['known-location'] = True
         # set internal event location for later use
         if context.get('unknown-location'):
