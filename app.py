@@ -585,11 +585,9 @@ def setEventInvites(request):
                     'Test message body from Salonniere',
                     render_template("invitation_email.html", owner=owner, guest_email=guest_email, event=event, month=month, day=day))
     return context # This might need to change
-#=================================================================================================
-# Utility Funcitons
-#=================================================================================================
 
-
+# Instantiate wit client after actions are defined
+wit_client = Wit(access_token=access_token, actions=actions)
 
 #=================================================================================================
 # Utility Funcitons
@@ -609,13 +607,6 @@ def _get_entity_values(entities, entity):
     if len(vals) == 0:
         return None
     return vals
-
-
-
-
-
-
-wit_client = Wit(access_token=access_token, actions=actions)
 
 # Create our database model
 # User model
