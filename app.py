@@ -192,6 +192,10 @@ def verify():
 
     return "Facebook Webhook URL", 200
 
+# Privacy policy
+@app.route('/privacy')
+def privacy():
+    return render_template('privacypolicy.html')
 
 @app.route('/facebook/webhook/', methods=['POST'])
 def webhook():
@@ -296,18 +300,6 @@ def webhook():
 #=================================================================================================
 # Server Actions
 #=================================================================================================
-actions = {
-    'send': send,
-    'setEventType': setEventType,
-    'setEventName': setEventName,
-    'setEventTime': setEventTime,
-    'setEventLocation': setEventLocation,
-    'findYelpSuggestions': findYelpSuggestions,
-    'setEventFood': setEventFood,
-    'setEventInvites': setEventInvites,
-    'getEventDetails': getEventDetails,
-    'answerOtherQuestion': answerOtherQuestion
-}
 
 # send message
 def send(request, response):
@@ -456,8 +448,16 @@ def setEventFood(request):
     context = request['context']
     entities = request['entities']
     event_food = _get_entity_value(entities, 'food')
-    # set internal event food for later use
-    context['eventFood'] = event_food
+    if event_food:
+        context['known-food'] = True
+        if context.get('unknown-food'):
+            del context['unknown-food']
+        # set internal event food for later use
+        context['eventFood'] = event_food
+    else:
+        context['unknown-food'] = True
+        if context.get('known-food'):
+            del context['known-food']
     return context
 
 def getEventDetails(request):
@@ -547,8 +547,6 @@ def askQuestionToHost(owner_id, question):
     context['cur_question'] = question
     send_message(fb_id, question)
     
-    
-
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
@@ -586,27 +584,26 @@ def setEventInvites(request):
                     render_template("invitation_email.html", owner=owner, guest_email=guest_email, event=event, month=month, day=day))
     return context # This might need to change
 
+actions = {
+    'send': send,
+    'setEventType': setEventType,
+    'setEventName': setEventName,
+    'setEventTime': setEventTime,
+    'setEventLocation': setEventLocation,
+    'findYelpSuggestions': findYelpSuggestions,
+    'setEventFood': setEventFood,
+    'setEventInvites': setEventInvites,
+    'getEventDetails': getEventDetails,
+    'answerOtherQuestion': answerOtherQuestion
+}
+
 # Instantiate wit client after actions are defined
 wit_client = Wit(access_token=access_token, actions=actions)
 
+
 #=================================================================================================
-# Utility Funcitons
+# Models
 #=================================================================================================
-
-
-# convenience function
-def _get_entity_value(entities, entity):
-    out = _get_entity_values(entities, entity)
-    if out:
-        return out[0]
-
-def _get_entity_values(entities, entity):
-    if entity not in entities:
-        return None
-    vals = list(i['value'] for i in entities[entity])
-    if len(vals) == 0:
-        return None
-    return vals
 
 # Create our database model
 # User model
@@ -666,6 +663,24 @@ class Event(db.Model):
             % (self.name, self.owner.fb_id, self.event_type, self.location, self.start_time, self.end_time, self.num_guests, self.attire, self.other))
 
 
+#=================================================================================================
+# Utility Funcitons
+#=================================================================================================
+
+# convenience function
+def _get_entity_value(entities, entity):
+    out = _get_entity_values(entities, entity)
+    if out:
+        return out[0]
+
+def _get_entity_values(entities, entity):
+    if entity not in entities:
+        return None
+    vals = list(i['value'] for i in entities[entity])
+    if len(vals) == 0:
+        return None
+    return vals
+
 def send_message(recipient_id, message_text):
 
     log("sending message to {recipient}: {text}".format(recipient=recipient_id, text=message_text))
@@ -715,10 +730,10 @@ def log(message):  # simple wrapper for logging to stdout on heroku
     print(str(message))
     sys.stdout.flush()
 
-# Privacy policy
-@app.route('/privacy')
-def privacy():
-    return render_template('privacypolicy.html')
+
+#=================================================================================================
+# For Debugging
+#=================================================================================================
 
 if __name__ == '__main__':
     app.run(debug=True)
