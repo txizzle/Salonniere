@@ -296,18 +296,6 @@ def webhook():
 #=================================================================================================
 # Server Actions
 #=================================================================================================
-actions = {
-    'send': send,
-    'setEventType': setEventType,
-    'setEventName': setEventName,
-    'setEventTime': setEventTime,
-    'setEventLocation': setEventLocation,
-    'findYelpSuggestions': findYelpSuggestions,
-    'setEventFood': setEventFood,
-    'setEventInvites': setEventInvites,
-    'getEventDetails': getEventDetails,
-    'answerOtherQuestion': answerOtherQuestion
-}
 
 # send message
 def send(request, response):
@@ -555,8 +543,6 @@ def askQuestionToHost(owner_id, question):
     context['cur_question'] = question
     send_message(fb_id, question)
     
-    
-
 def setEventInvites(request):
     context = request['context']
     entities = request['entities']
@@ -593,11 +579,19 @@ def setEventInvites(request):
                     'Test message body from Salonniere',
                     render_template("invitation_email.html", owner=owner, guest_email=guest_email, event=event, month=month, day=day))
     return context # This might need to change
-#=================================================================================================
-# Utility Funcitons
-#=================================================================================================
 
-
+actions = {
+    'send': send,
+    'setEventType': setEventType,
+    'setEventName': setEventName,
+    'setEventTime': setEventTime,
+    'setEventLocation': setEventLocation,
+    'findYelpSuggestions': findYelpSuggestions,
+    'setEventFood': setEventFood,
+    'setEventInvites': setEventInvites,
+    'getEventDetails': getEventDetails,
+    'answerOtherQuestion': answerOtherQuestion
+}
 
 #=================================================================================================
 # Utility Funcitons
