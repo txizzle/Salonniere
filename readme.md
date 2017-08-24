@@ -1,7 +1,8 @@
 # Salonniere Intelligent Event Organizer
-Salonniere is an intelligent event organizer built for UC Berkeley's Chatbot Collider in Fall 2016. 
+Salonniere is an intelligent event organizer that won UC Berkeley's Chatbot Collider Competition in Fall 2016. Here's [an article](http://scet.berkeley.edu/team-salonniere-wins-ai-chatbot-collider/) about the competition and results. 
 
 Salonniere's [Webpage](http://salonniere.herokuapp.com/)
+
 Salonniere's [Facebook Page](https://www.facebook.com/SalonniereAI/)
 
 # This repository
